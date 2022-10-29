@@ -9,10 +9,12 @@
 ### Installation
 
 #### RocksDB
-``git clone https://github.com/facebook/rocksdb.git  
-cd rocksdb  
-DEBUG_LEVEL=0 make shared_lib install-shared  
-export LD_LIBRARY_PATH=/usr/local/lib``
+0. `sudo su`
+1. `cd ~`
+2. `git clone https://github.com/facebook/rocksdb.git`
+3. `cd rocksdb`
+4. `DEBUG_LEVEL=0 make shared_lib install-shared`
+5. `export LD_LIBRARY_PATH=/usr/local/lib`
 
 
 ### File Structure
