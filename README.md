@@ -5,3 +5,7 @@
 ### Datasets
 1. [Twitter Dataset](https://www.kaggle.com/datasets/kazanova/sentiment140)
 2. [ImageNet Dataset](https://image-net.org/download-images.php)
+
+
+### File Structure
+- Twitter dataset: /mnt/data/twitter/
