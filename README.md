@@ -9,7 +9,6 @@
 ### Installation
 
 #### RocksDB
-0. `sudo su`
 1. `cd /mnt/data`
 2. `git clone https://github.com/facebook/rocksdb.git`
 3. `cd rocksdb`
