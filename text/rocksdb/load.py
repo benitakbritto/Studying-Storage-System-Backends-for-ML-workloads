@@ -13,6 +13,7 @@ from csv import reader
 '''
 DATASET_PATH = '/mnt/data/dataset/twitter/twitter_clean.csv'
 DB_PATH = './db_path'
+METADATA_KEY = "TEXT_WORKLOAD"
 
 class TwitterDataset:
     def __init__(self, target, ids, date, flag, user, text):
@@ -30,10 +31,15 @@ class TwitterDataset:
 class RocksDBLoader:
     def __init__(self):
         self.db = rocksdb3.open_default(DB_PATH)
+        self.len = 0
     
     # helper
     def int_to_bytes(self, x):
         return x.to_bytes((x.bit_length() + 7), 'big')
+    
+    # helper
+    def bytes_to_int(self, xbytes):
+        return int.from_bytes(xbytes, 'big')
 
     # Read dataset file and put to rocksdb
     # saves key as rowIndex
@@ -61,14 +67,31 @@ class RocksDBLoader:
                 row_index += 1
 
         print(f'[DEBUG] At end of function, row_index = {row_index}')
+        self.len = row_index
 
+    def write_metadata_to_db(self, key):
+        self.db.put(key.encode(), self.int_to_bytes(self.len))
 
     # For debugging
     def read_from_db(self, key):
-        key_in_bytes = self.int_to_bytes(key)
-        val = self.db.get(key_in_bytes).decode()
-        decode_obj = json.loads(val)
-        print(f'[DEBUG] Decoded_obj = {decode_obj}')
+        key_in_bytes = None
+        if isinstance(key, int):
+            key_in_bytes = self.int_to_bytes(key)
+        elif isinstance(key, str):
+            key_in_bytes = key.encode()
+
+
+        val = self.db.get(key_in_bytes)
+        assert val is not None
+
+        if key == "TEXT_WORKLOAD":
+            val_as_int = self.bytes_to_int(val)
+            print(f'[DEBUG] val = {val_as_int}')    
+        else:
+            val_as_json = json.loads(val.decode())
+            print(f'[DEBUG] val = {val_as_json}')
+
+        
 
     # For debugging
     def delete_db(self):
