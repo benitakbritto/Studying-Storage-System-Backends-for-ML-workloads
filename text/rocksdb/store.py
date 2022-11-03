@@ -79,4 +79,5 @@ class RocksDBLoader:
 if __name__ == "__main__":
     loader = RocksDBLoader()
     loader.load_dataset()
+    loader.write_metadata_to_db(constants.METADATA_KEY)
 
