@@ -16,6 +16,14 @@
 5. `export LD_LIBRARY_PATH=/usr/local/lib`
 6. `pip install rocksdb3` (More info on [rocksdb3](https://pypi.org/project/rocksdb3/)
 
+#### TileDB
+TODO
+
+#### TensorStore
+TODO
+
+#### PyTorch
+TODO
 
 ### File Structure
 - Twitter dataset: /mnt/data/twitter/
