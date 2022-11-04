@@ -1,12 +1,11 @@
-from csv import reader
+import asyncio
 import constants
+import json
 import twitter_dataset as twitter
 import tensorstore as ts
-import asyncio
 import time
-import json
-import torch
-from torch.utils.data import Dataset
+from csv import reader
+from torch.utils.data import Dataset, DataLoader
 
 class TensorStoreDataset(Dataset):
 
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     start = time.time()    
     
     # TODO: Tweak these values
-    data_train = torch.utils.data.DataLoader(
+    data_train = DataLoader(
         dataset,
         batch_size=4,
         shuffle=True, 
