@@ -1,6 +1,5 @@
 import tiledb
-import constants
-
+import tiledb.constants  as constants
 class TileDBIterator():
     def __init__(self, cache_len, start, end):
         # cache stores
@@ -13,6 +12,7 @@ class TileDBIterator():
         self.last_exclusive_idx = start - 1
         
         # items to fetch in one shot, don't overfetch
+        # import pdb; pdb.set_trace()
         self.cache_len = min(cache_len, end - start + 1)
 
     def __iter__(self):

@@ -1,6 +1,6 @@
 import math
 from time import sleep
-from TileDBIterator import TileDBIterator
+from tiledb.TileDBIterator import TileDBIterator
 from torch.utils.data import IterableDataset, DataLoader, get_worker_info
 
 '''
@@ -10,7 +10,7 @@ dl = DataLoader(ds, num_workers=0)
 '''
 class TileDBIterableDataset(IterableDataset):
     def __init__(self, start, end, cache_len):
-        assert end > start, "this example code only works with end > start"
+        # assert end > start, "this example code only works with end > start"
         self.start = start
         self.end = end
         self.cache_len = cache_len
@@ -39,13 +39,13 @@ if __name__ == "__main__":
     # run one at a time, too many tensor workers are causing issue
 
     # Single-process loading
-    print(list(DataLoader(ds, num_workers=0)))
-    sleep(3)
+    # print(list(DataLoader(ds, num_workers=0)))
+    # sleep(3)
 
-    # Mult-process loading with two worker processes
-    # Worker 0 fetched [3, 4].  Worker 1 fetched [5, 6].
-    print(list(DataLoader(ds, num_workers=2)))
-    sleep(3)
+    # # Mult-process loading with two worker processes
+    # # Worker 0 fetched [3, 4].  Worker 1 fetched [5, 6].
+    # print(list(DataLoader(ds, num_workers=2)))
+    # sleep(3)
 
     # With even more workers
     print(list(DataLoader(ds, num_workers=12)))
