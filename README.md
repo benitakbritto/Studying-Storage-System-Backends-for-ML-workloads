@@ -17,7 +17,9 @@
 6. `pip install rocksdb3` (More info on [rocksdb3](https://pypi.org/project/rocksdb3/)
 
 #### TileDB
-TODO
+$ conda install numpy pandas
+
+$ conda install -c conda-forge tiledb-py pyarrow
 
 #### TensorStore
 TODO
