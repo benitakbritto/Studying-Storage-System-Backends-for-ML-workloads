@@ -33,7 +33,7 @@ class TensorStoreDataset(Dataset):
                 val = json_string.encode()
                 
                 # write to tensorstore
-                self.store.write(key, val)
+                await self.store.write(key, val)
 
                 row_index += 1  
             

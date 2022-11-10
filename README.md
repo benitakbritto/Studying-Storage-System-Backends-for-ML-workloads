@@ -5,6 +5,7 @@
 ### Datasets
 1. [Twitter Dataset](https://www.kaggle.com/datasets/kazanova/sentiment140)
 2. [ImageNet Dataset](https://image-net.org/download-images.php)
+3. [CIFAR-100](https://www.kaggle.com/datasets/fedesoriano/cifar100)
 
 ### Installation
 
@@ -27,3 +28,4 @@ TODO
 
 ### File Structure
 - Twitter dataset: /mnt/data/twitter/
+
