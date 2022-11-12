@@ -23,11 +23,11 @@ class TensorStoreImageIterator():
             },
             'metadata': {
                 'compression': {
-                    'type': 'gzip'
+                    'type': 'raw'
                 },
                 'dataType': 'float32',
                 'dimensions': [constants.INPUT_SIZE, constants.IMAGE_SIZE + constants.LABEL_SIZE],
-                'blockSize': [100, 100],
+                'blockSize': [4000, 4000],
             },
         }).result()
 

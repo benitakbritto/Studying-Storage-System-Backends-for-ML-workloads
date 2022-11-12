@@ -1,5 +1,4 @@
 import tensorstore as ts
-from torchvision.datasets import CIFAR100
 import torchvision.transforms as tt
 import torch
 from torch.utils.data import DataLoader
@@ -16,11 +15,11 @@ def dump_to_db():
         },
         'metadata': {
             'compression': {
-                'type': 'gzip'
+                'type': 'raw'
             },
             'dataType': 'float32',
             'dimensions': [len(input_data), constants.IMAGE_SIZE + constants.LABEL_SIZE],
-            'blockSize': [100, 100],
+            'blockSize': [4000, 4000],
         },
         'create': True,
         'delete_existing': True,
