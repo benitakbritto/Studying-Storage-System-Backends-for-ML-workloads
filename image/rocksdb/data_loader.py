@@ -20,6 +20,7 @@ class RocksDBDataset(Dataset):
         assert self.image_dim is not None 
         self.batch_idx_in_mem = -1
         self.worker_cache = torch.empty(self.batch_in_key, self.image_dim)
+        self.count = 0
 
     def __len__(self):
         val = self.db.get('NUM_OF_IMAGES'.encode())
@@ -43,6 +44,7 @@ class RocksDBDataset(Dataset):
         val = self.db.get(self.int_to_bytes(batch_index))
         buff.write(val)
         buff.seek(0)
+        self.count += 1
         return torch.load(buff)
 
     # return image tensor, label
@@ -50,7 +52,7 @@ class RocksDBDataset(Dataset):
         batch_index = self.get_batch_index(idx)
         offset = self.get_offset(idx)
 
-        if self.batch_idx_in_mem < batch_index:
+        if self.batch_idx_in_mem != batch_index:
             self.batch_idx_in_mem = batch_index
             self.cache = self.get_data_from_db(batch_index)
         
@@ -58,7 +60,7 @@ class RocksDBDataset(Dataset):
             
 # TODO     
 if __name__ == "__main__":
-    NUM_WORKERS = 8
+    NUM_WORKERS = 0
     cifar = RocksDBDataset()
     start = time.time()
     
@@ -66,7 +68,7 @@ if __name__ == "__main__":
     # Note: Must choose shuffle=False, else out of bounds
     data_train = DataLoader(
         cifar,
-        batch_size=4,
+        batch_size=256,
         shuffle=False, 
         num_workers=NUM_WORKERS
     )
@@ -77,4 +79,6 @@ if __name__ == "__main__":
     
     end = time.time()
     print(f'Elapsed time = {end - start}')
+
+    print(f'# calls to db = {cifar.count}')
         
