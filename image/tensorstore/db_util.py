@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 import constants
 import PrepareData as prep
+import time
 
 def dump_to_db():
     input_data = prep.PrepareData().getInputData()
@@ -19,7 +20,7 @@ def dump_to_db():
             },
             'dataType': 'float32',
             'dimensions': [len(input_data), constants.IMAGE_SIZE + constants.LABEL_SIZE],
-            'blockSize': [4000, 4000],
+            'blockSize': [1000, 100],
         },
         'create': True,
         'delete_existing': True,
@@ -39,10 +40,13 @@ def dump_to_db():
         labels = labels.reshape(size, 1)
         images = images.reshape(size, 3*32*32)
         imlabels = torch.cat((images, labels), -1)
-        write_future = dataset[i:i+size, :].write(imlabels)
+        write_future = dataset[i:i+size, :].write(imlabels).result()
         i+=size
 
     print("Loaded")
 
 if __name__ == "__main__":
+    start = time.time()
     dump_to_db()
+    end = time.time()
+    print(f'elapsed time = {end-start}')

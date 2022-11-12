@@ -1,7 +1,6 @@
 from torch.utils.data import DataLoader, IterableDataset, get_worker_info
 import time
 import math
-from time import sleep
 from TensorStoreImageIterator import TensorStoreImageIterator
 import constants
 
@@ -46,6 +45,7 @@ if __name__ == "__main__":
 
     # # With even more workers
     output = list(DataLoader(ds, num_workers=8))
+    print(output[49999])
     end = time.time()
     
     print(f'Elapsed time = {end - start}')
