@@ -31,3 +31,7 @@ TODO
 ### File Structure
 - Twitter dataset: /mnt/data/twitter/
 
+## Metrics Ideas:
+- READ: Time, Memory, CPU - Change prefetch size (for all ds)
+- WRITE: Time, Memory, CPU - Change bulk insertion size (for all ds)
+
