@@ -10,6 +10,7 @@ import rocksdb3
 from torch.utils.data import Dataset, DataLoader, get_worker_info
 import time
 import io
+import constants
 
 class RocksDBDataset(Dataset):
     def __init__(self):
@@ -58,7 +59,6 @@ class RocksDBDataset(Dataset):
         
         return self.cache[offset]
             
-# TODO     
 if __name__ == "__main__":
     NUM_WORKERS = 0
     cifar = RocksDBDataset()
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     # Note: Must choose shuffle=False, else out of bounds
     data_train = DataLoader(
         cifar,
-        batch_size=256,
+        batch_size=constants.BATCH_SIZE,
         shuffle=False, 
         num_workers=NUM_WORKERS
     )
