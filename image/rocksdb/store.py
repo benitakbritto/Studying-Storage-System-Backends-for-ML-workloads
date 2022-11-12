@@ -21,6 +21,12 @@ def convert_tensor_to_bytes(tensor_data):
     buff.seek(0) 
     return buff.read()
 
+def int_to_bytes(x):
+    return x.to_bytes((x.bit_length() + 7), 'big')
+    
+def bytes_to_int(xbytes):
+    return int.from_bytes(xbytes, 'big')
+
 # Source: https://blog.jovian.ai/image-classification-of-cifar100-dataset-using-pytorch-8b7145242df1
 stats = ((0.5074,0.4867,0.4411),(0.2011,0.1987,0.2025)) 
 train_transform = tt.Compose([
@@ -44,10 +50,14 @@ for batch_idx, (images, labels) in enumerate(data_train):
     # images | labels
     value_in_tensor = torch.cat((images, labels), -1)
     value_in_bytes = convert_tensor_to_bytes(value_in_tensor)
-    key_in_bytes = bytes(batch_idx)
+    key_in_bytes = int_to_bytes(batch_idx)
     db.put(key_in_bytes, value_in_bytes)
 
 # Write metadata
-db.put('BATCH_SIZE'.encode(), bytes(256))
-db.put('IMAGE_DIM'.encode(), bytes(3*32*32))
-
+db.put('BATCH_SIZE'.encode(), int_to_bytes(256))
+db.put('IMAGE_DIM'.encode(), int_to_bytes(3*32*32))
+train_data_len = len(train_data)
+num_batches = (int) (train_data_len / BATCH_SIZE)
+db.put('NUM_OF_IMAGES'.encode(), int_to_bytes(train_data_len))
+db.put('LAST_BATCH_SIZE'.encode(), int_to_bytes(train_data_len - num_batches * BATCH_SIZE))
+db.put('NUM_BATCHES'.encode(), int_to_bytes(num_batches))
