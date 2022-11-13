@@ -27,7 +27,7 @@ class TensorStoreImageIterator():
                 },
                 'dataType': 'float32',
                 'dimensions': [constants.INPUT_SIZE, constants.IMAGE_SIZE + constants.LABEL_SIZE],
-                'blockSize': [4000, 4000],
+                'blockSize': [1000, 100],
             },
         }).result()
 

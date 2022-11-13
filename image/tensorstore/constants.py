@@ -4,5 +4,5 @@ DATA_DIR = '/mnt/data'
 PATH_TO_KV_STORE = DATA_DIR + '/store/'
 PATH_TO_DATASET = DATA_DIR + '/dataset/cifar/'
 IMAGE_SIZE = 3*32*32
-LABEL_SIZE = 3*32*32
+LABEL_SIZE = 1
 INPUT_SIZE = 50000
