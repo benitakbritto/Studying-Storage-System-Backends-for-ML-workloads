@@ -20,7 +20,7 @@ class RocksDBDataset(Dataset):
         self.image_dim = self.bytes_to_int(self.db.get('IMAGE_DIM'.encode())) + 1
         assert self.image_dim is not None 
         self.batch_idx_in_mem = -1
-        self.worker_cache = torch.empty(self.batch_in_key, self.image_dim)
+        self.cache = torch.empty(self.batch_in_key, self.image_dim)
         self.count = 0
 
     def __len__(self):
