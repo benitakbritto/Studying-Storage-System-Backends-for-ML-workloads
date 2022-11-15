@@ -1,5 +1,5 @@
 
-BATCH_SIZE = 256
+BATCH_SIZE = 256*8
 DATA_DIR = '/mnt/data'
 PATH_TO_KV_STORE = DATA_DIR + '/store/'
 PATH_TO_DATASET = DATA_DIR + '/dataset/cifar/'
