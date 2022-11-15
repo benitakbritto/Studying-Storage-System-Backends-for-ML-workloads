@@ -35,3 +35,5 @@ TODO
 - READ: Time, Memory, CPU - Change prefetch size (for all ds)
 - WRITE: Time, Memory, CPU - Change bulk insertion size (for all ds)
 
+## TODO GRAPHS
+- Increase batch size in dataloader and note elapsed time
