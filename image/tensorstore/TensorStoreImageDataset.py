@@ -44,8 +44,13 @@ if __name__ == "__main__":
     # sleep(3)
 
     # # With even more workers
-    output = list(DataLoader(ds, batch_size=constants.INPUT_SIZE, num_workers = 8))
+    output = DataLoader(ds, batch_size = 1024, num_workers = 8)
+    read = 0
+
+    for tensor in output:
+        read += tensor.shape[0]
 
     end = time.time()
     
     print(f'Elapsed time = {end - start}')
+    print(f'Items read = {read}')
