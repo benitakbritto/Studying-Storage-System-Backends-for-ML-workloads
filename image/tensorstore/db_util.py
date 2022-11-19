@@ -20,7 +20,7 @@ def dump_to_db():
             },
             'dataType': 'float32',
             'dimensions': [len(input_data), constants.IMAGE_SIZE + constants.LABEL_SIZE],
-            'blockSize': [1000, 100],
+            'blockSize': [1024, 3073],
         },
         'create': True,
         'delete_existing': True,
@@ -30,7 +30,7 @@ def dump_to_db():
             input_data,
             batch_size = constants.BATCH_SIZE,
             shuffle = False, 
-            num_workers = 4
+            num_workers = 8
         )
 
     i = 0

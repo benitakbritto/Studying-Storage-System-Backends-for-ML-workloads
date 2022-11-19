@@ -25,11 +25,11 @@ class TensorStoreImageDataset(IterableDataset):
             iter_start = self.start + worker_id * per_worker
             iter_end = min(iter_start + per_worker, self.end)
         
-        return TensorStoreImageIterator(cache_len=self.cache_len, start = iter_start, end = iter_end)
+        return TensorStoreImageIterator(cache_len = self.cache_len, start = iter_start, end = iter_end)
 
 if __name__ == "__main__":
     # should give same set of data as range(3, 7), i.e., [3, 4, 5, 6].
-    ds = TensorStoreImageDataset(start=0, end=constants.INPUT_SIZE, cache_len=256)
+    ds = TensorStoreImageDataset(start=0, end=constants.INPUT_SIZE, cache_len=constants.INPUT_SIZE)
     
     start = time.time()
     # run one at a time, too many tensor workers are causing issue
@@ -44,8 +44,13 @@ if __name__ == "__main__":
     # sleep(3)
 
     # # With even more workers
-    output = list(DataLoader(ds, num_workers=8))
-    print(output[49999])
+    output = DataLoader(ds, batch_size = 1024, num_workers = 8)
+    read = 0
+
+    for tensor in output:
+        read += tensor.shape[0]
+
     end = time.time()
     
     print(f'Elapsed time = {end - start}')
+    print(f'Items read = {read}')
