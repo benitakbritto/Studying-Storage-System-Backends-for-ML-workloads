@@ -6,6 +6,8 @@
 1. [Twitter Dataset](https://www.kaggle.com/datasets/kazanova/sentiment140)
 2. [ImageNet Dataset](https://image-net.org/download-images.php)
 3. [CIFAR-100](https://www.kaggle.com/datasets/fedesoriano/cifar100)
+4. [FB15K-237](https://www.microsoft.com/en-us/download/details.aspx?id=52312)
+5. [FB15K Large](https://developers.google.com/freebase) -- this is too big
 
 ### Installation
 
