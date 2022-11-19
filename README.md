@@ -23,7 +23,8 @@ Concatenate the dataset for each ML workload to move a larger version of it (TOD
 3. `cd rocksdb`
 4. `DEBUG_LEVEL=0 make shared_lib install-shared`
 5. `export LD_LIBRARY_PATH=/usr/local/lib`
-6. `pip install rocksdb3` (More info on [rocksdb3](https://pypi.org/project/rocksdb3/)
+6. `pip install rocksdb3` (More info on [rocksdb3](https://pypi.org/project/rocksdb3/)) OR
+`pip install rocksdict` (More info on [RocksDict](https://github.com/Congyuwang/RocksDict))
 
 #### TileDB
 $ conda install numpy pandas
