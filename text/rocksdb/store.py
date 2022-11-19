@@ -21,7 +21,7 @@ class RocksDBLoader:
     # saves value as byte encoded json obj of the TwitterDataset class
     def load_dataset(self):
         row_index = 0
-        with open(constants.DATASET_PATH, 'r') as read_obj:
+        with open(constants.DATASET_PATH, 'r', encoding=constants.INPUT_FILE_ENCODING) as read_obj:
             csv_reader = reader(read_obj)
             
             for row_data in enumerate(csv_reader):
