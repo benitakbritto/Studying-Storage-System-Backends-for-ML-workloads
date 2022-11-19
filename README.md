@@ -1,6 +1,7 @@
 # CS744-Project
 
 [Project Proposal](https://drive.google.com/drive/u/2/folders/17alBOquTtHBdmi9bu8b_zSJWVMvB24WF)
+[Project Check-in](https://docs.google.com/document/d/1ZmUIVHlWYe_GlfWPdzbpVuOkVHCzkgGqR1IKiRh_7Cg/edit#)
 
 ### Datasets
 1. [Twitter Dataset](https://www.kaggle.com/datasets/kazanova/sentiment140)
