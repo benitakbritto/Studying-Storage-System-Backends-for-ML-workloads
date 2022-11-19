@@ -6,7 +6,7 @@
 '''
 
 import torch
-import rocksdb3
+from rocksdict import Rdict
 from torch.utils.data import Dataset, DataLoader
 import helper as bytes
 import constants
@@ -15,16 +15,16 @@ import time
 
 class RocksDBDataset(Dataset):
     def __init__(self):
-        self.db = rocksdb3.open_default(constants.DB_PATH)
+        self.db = Rdict(constants.DB_PATH)
 
     def __len__(self):
-        val = self.db.get(constants.METADATA_KEY.encode())
+        val = self.db[constants.METADATA_KEY.encode()]
         assert val is not None
         return bytes.bytes_to_int(val)
     
     # returns the text and target attribute from a row
     def __getitem__(self, idx):
-        val = self.db.get(bytes.int_to_bytes(idx))
+        val = self.db[bytes.int_to_bytes(idx)]
         val = json.loads(val.decode())
         return val['text'], val['target']
         
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     data_train = torch.utils.data.DataLoader(
         twitter,
         batch_size=4,
-        shuffle=True, 
+        shuffle=False, 
         num_workers=0
     )
 
