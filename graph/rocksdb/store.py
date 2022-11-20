@@ -53,6 +53,11 @@ class RocksDBStore:
                 
                 self.num_rows += 1
 
+        # last batch
+        if self.current_size != 0:
+            key_in_bytes = bytes.int_to_bytes(key_index)
+            self.db[key_in_bytes] = self.convert_tensor_to_bytes(self.data)
+
         print(f'[DEBUG] At end of function, nums_rows = {self.num_rows}')
 
     def store_metadata(self):
