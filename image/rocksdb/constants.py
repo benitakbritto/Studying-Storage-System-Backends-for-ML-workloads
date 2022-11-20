@@ -1,3 +1,7 @@
 DATASET_PATH = "../../../../../../mnt/data/dataset/cifar/"
 DB_PATH = "./db_path"
-BATCH_SIZE = 256
+NUM_OF_ROWS_IN_KEY = 'NUM_OF_ROWS_IN_KEY'
+IMAGE_DIM = 'IMAGE_DIM'
+NUM_OF_IMAGES = 'NUM_OF_IMAGES'
+ROWS_LAST_KEY = 'ROWS_IN_LAST_KEY'
+NUM_KEYS = 'NUM_KEYS'
