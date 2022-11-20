@@ -54,7 +54,7 @@ class RocksDBDataset(Dataset):
             self.cache = self.get_data_from_db(key_index)
         
         val = self.cache[offset]
-        val = json.loads(val.decode())
+        val = json.loads(val)
         return val['text'], val['target']
         
 if __name__ == "__main__":

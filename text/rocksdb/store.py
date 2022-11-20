@@ -50,8 +50,7 @@ class RocksDBLoader:
                     row_data_list[5])
                 
                 json_string = dataset_obj.to_json()
-                val = json_string.encode()
-                self.data.append(val)
+                self.data.append(json_string)
                 self.current_size += 1
 
                 if self.current_size == self.target_size:
