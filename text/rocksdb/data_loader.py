@@ -34,7 +34,7 @@ class RocksDBDataset(Dataset):
         return idx % self.rows_in_key
     
     def get_key_index(self, idx):
-        return (int) (idx / self.rows_in_key)
+        return idx // self.rows_in_key
     
     def get_data_from_db(self, key_index):
         buff = io.BytesIO()

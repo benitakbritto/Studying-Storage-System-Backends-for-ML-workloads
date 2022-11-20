@@ -67,16 +67,20 @@ class RocksDBLoader:
                 
                 self.num_rows += 1
                 
-        self.num_keys = key_index
-        print(f'[DEBUG] At end of function, num_keys = {self.num_keys}')
+        # last batch
+        if self.current_size != 0:
+            key_in_bytes = bytes.int_to_bytes(key_index)
+            self.db[key_in_bytes] = self.convert_tensor_to_bytes(self.data)
+        
         print(f'[DEBUG] At end of function, nums_rows = {self.num_rows}')
 
     # Store the number of rows in this dataset
     def store_metadata(self):
-        self.db[constants.NUM_KEYS.encode()] = bytes.int_to_bytes((int)(self.num_rows / self.target_size) + (self.num_rows % self.target_size != 0))
+        self.db[constants.NUM_KEYS.encode()] = bytes.int_to_bytes(self.num_rows // self.target_size + (self.num_rows % self.target_size != 0))
         self.db[constants.NUM_ROWS_PER_KEY.encode()] = bytes.int_to_bytes(self.target_size)
         self.db[constants.NUM_ROWS_LAST_KEY.encode()] = bytes.int_to_bytes(self.num_rows % self.target_size)
         self.db[constants.NUM_ROWS.encode()] = bytes.int_to_bytes(self.num_rows)
+
 '''
     Driver
 '''
