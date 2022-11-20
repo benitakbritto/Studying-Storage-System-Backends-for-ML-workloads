@@ -66,6 +66,9 @@ class RocksDBStore:
         self.db[constants.NUM_ROWS_LAST_KEY.encode()] = bytes.int_to_bytes(self.num_rows % self.target_size)
         self.db[constants.NUM_ROWS.encode()] = bytes.int_to_bytes(self.num_rows)
 
+    def cleanup(self):
+        self.db.close()
+
 '''
     Driver
 '''
@@ -80,5 +83,7 @@ if __name__ == "__main__":
     end = time.time()
 
     print(f'Elapsed time = {end - start}')
+
+    store.cleanup()
 
 
