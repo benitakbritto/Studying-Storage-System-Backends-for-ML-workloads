@@ -28,7 +28,7 @@ class RocksDBDataset(Dataset):
     def __len__(self):
         val = self.db[constants.NUM_ROWS.encode()]
         assert val is not None
-        print(f'len = {bytes.bytes_to_int(val)}')
+        print(f'[DEBUG] len = {bytes.bytes_to_int(val)}')
         return bytes.bytes_to_int(val)
     
     def get_offset(self, idx):
@@ -54,7 +54,7 @@ class RocksDBDataset(Dataset):
             self.key_idx_in_mem = key_index
             self.cache = self.get_data_from_db(key_index)
             
-        val = (self.cache[offset]).decode()
+        val = self.cache[offset]
         return val.split()
         
 if __name__ == "__main__":

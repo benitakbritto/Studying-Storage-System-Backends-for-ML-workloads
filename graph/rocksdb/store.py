@@ -36,8 +36,7 @@ class RocksDBStore:
         key_index = 0
         with open(constants.DATASET_PATH, 'r') as file:
             for line in file:
-                value_in_bytes = line.encode()
-                self.data.append(value_in_bytes)
+                self.data.append(line)
                 self.current_size += 1
 
                 if self.current_size == self.target_size:
