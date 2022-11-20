@@ -81,6 +81,9 @@ class RocksDBStore:
         self.db[constants.ROWS_LAST_KEY.encode()] = self.int_to_bytes(self.train_data_len % args.rows_per_key)
         self.db[constants.NUM_KEYS.encode()] = self.int_to_bytes((int)(self.train_data_len / args.rows_per_key) + (self.train_data_len % args.rows_per_key != 0))
 
+    def cleanup(self):
+        self.db.close()
+
 if __name__ == "__main__":
     store_obj = RocksDBStore()
 
@@ -91,3 +94,5 @@ if __name__ == "__main__":
     
     end = time.time()
     print(f'Elapsed time = {end - start}')
+
+    store_obj.cleanup()
