@@ -75,3 +75,5 @@ if __name__ == "__main__":
     
     end = time.time()
     print(f'Elapsed time = {end - start}')
+
+    print(f'# calls to db = {fb15k.count}')
