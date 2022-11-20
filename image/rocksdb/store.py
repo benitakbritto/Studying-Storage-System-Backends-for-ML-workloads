@@ -79,7 +79,7 @@ class RocksDBStore:
         self.db[constants.IMAGE_DIM.encode()] = self.int_to_bytes(3*32*32)
         self.db[constants.NUM_OF_IMAGES.encode()] = self.int_to_bytes(self.train_data_len)
         self.db[constants.ROWS_LAST_KEY.encode()] = self.int_to_bytes(self.train_data_len % args.rows_per_key)
-        self.db[constants.NUM_KEYS.encode()] = self.int_to_bytes((int)(self.train_data_len / args.rows_per_key))
+        self.db[constants.NUM_KEYS.encode()] = self.int_to_bytes((int)(self.train_data_len / args.rows_per_key) + (self.train_data_len % args.rows_per_key != 0))
 
 if __name__ == "__main__":
     store_obj = RocksDBStore()

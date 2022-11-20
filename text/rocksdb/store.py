@@ -73,7 +73,7 @@ class RocksDBLoader:
 
     # Store the number of rows in this dataset
     def store_metadata(self):
-        self.db[constants.NUM_KEYS.encode()] = bytes.int_to_bytes(self.num_keys)
+        self.db[constants.NUM_KEYS.encode()] = bytes.int_to_bytes((int)(self.num_rows / self.target_size) + (self.num_rows % self.target_size != 0))
         self.db[constants.NUM_ROWS_PER_KEY.encode()] = bytes.int_to_bytes(self.target_size)
         self.db[constants.NUM_ROWS_LAST_KEY.encode()] = bytes.int_to_bytes(self.num_rows % self.target_size)
         self.db[constants.NUM_ROWS.encode()] = bytes.int_to_bytes(self.num_rows)
@@ -81,11 +81,11 @@ class RocksDBLoader:
     Driver
 '''
 if __name__ == "__main__":
-    start = time.time()
+    store = RocksDBLoader()
 
-    loader = RocksDBLoader()
-    loader.store_data()
-    loader.store_metadata()
+    start = time.time()
+    store.store_data()
+    store.store_metadata()
 
     end = time.time()
 
