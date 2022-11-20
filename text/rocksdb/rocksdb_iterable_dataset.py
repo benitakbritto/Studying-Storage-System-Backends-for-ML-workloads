@@ -28,7 +28,7 @@ class RocksDBIterableDataset(IterableDataset):
             iter_end = min(iter_start + per_worker, self.end)
         return RocksDBIterator(cache_len=self.cache_len, start = iter_start, end = iter_end)
 
-
+# TODO: Does not work when num_workers > 0 due to db lock issue
 if __name__ == "__main__":
     # should give same set of data as range(3, 7), i.e., [3, 4, 5, 6].
     ds = RocksDBIterableDataset(start=3, end=7, cache_len=100)

@@ -28,6 +28,7 @@ class RocksDBIterableDataset(IterableDataset):
             iter_end = min(iter_start + per_worker, self.end)
         return RocksDBIterator(cache_len=self.cache_len, start = iter_start, end = iter_end)
 
+
 # TODO: Does not work when num_workers > 0 due to db lock issue
 if __name__ == "__main__":
     # should give same set of data as range(3, 7), i.e., [3, 4, 5, 6].
@@ -36,12 +37,12 @@ if __name__ == "__main__":
     # run one at a time, too many tensor workers are causing issue
 
     # Single-process loading
-    # print(list(DataLoader(ds, num_workers=0)))
+    print(list(DataLoader(ds, num_workers=0)))
     # sleep(3)
 
     # # Mult-process loading with two worker processes
     # # Worker 0 fetched [3, 4].  Worker 1 fetched [5, 6].
-    # print(list(DataLoader(ds, num_workers=1)))
+    # print(list(DataLoader(ds, num_workers=2)))
     # sleep(3)
 
     # With even more workers
