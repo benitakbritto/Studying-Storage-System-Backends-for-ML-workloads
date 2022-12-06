@@ -7,6 +7,7 @@ import tile_db.dump as tile_db_dump
 from rocksDB.store import RocksDBStore
 from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
+from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -49,7 +50,6 @@ start = None
 end = None
 
 if args.ds == 'rd':
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m
     # Store data in rocks db
     start = time.time()
 
@@ -58,9 +58,9 @@ if args.ds == 'rd':
     store.store_metadata()
     
     end = time.time()
-    print(f'{args.ds} Store time = {end - start} s')
 
     # Set Dataloader
+    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
     if args.type == 'm':
         dataset = RocksDBMapStyleDataset()
         dataloader = DataLoader(
@@ -69,10 +69,11 @@ if args.ds == 'rd':
             shuffle=False, 
             num_workers=args.num_workers
         )
+    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type i -batch-size 256 -pf 256
     elif args.type == 'i':
         total_rows = store.get_total_input_rows()
-        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-        dataloader = DataLoader(dataset=dataset)
+        dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+        dataloader = DataLoader(dataset=dataset, num_workers=0)
     
     store.cleanup()
     

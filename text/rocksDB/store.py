@@ -84,23 +84,3 @@ class RocksDBStore:
 
     def cleanup(self):
         self.db.close()
-
-'''
-    Driver Example
-'''
-# if __name__ == "__main__":
-#     input_file = '/mnt/data/dataset/twitter/twitter_sentiment_dataset.csv'
-#     num_of_input_rows_per_key = 1
-
-#     store = RocksDBStore(input_file, num_of_input_rows_per_key)
-
-#     start = time.time()
-#     store.store_data()
-#     store.store_metadata()
-
-#     end = time.time()
-
-#     print(f'Elapsed time = {end - start}')
-
-#     store.cleanup()
-
