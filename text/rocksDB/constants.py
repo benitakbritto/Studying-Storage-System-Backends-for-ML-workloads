@@ -1,4 +1,3 @@
-DATASET_PATH = '/mnt/data/dataset/twitter/twitter_sentiment_dataset.csv'
 DB_PATH = './db_path'
 INPUT_FILE_ENCODING = 'ISO-8859-1'
 NUM_ROWS_PER_KEY = 'NUM_OF_ROWS_PER_KEY'

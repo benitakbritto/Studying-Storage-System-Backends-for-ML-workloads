@@ -1,32 +1,29 @@
 '''
-    @brief: TODO: Add better desc, supports storing single value or multiple values per key
+    @brief: Storing single value or multiple values per key by reading data 
+        from the filesystem and storing it in storage backends
     @prereq: bash
-    @usage: python <filename> --rows-per-key <num>
+    @usage: from main.py
     @authors: Benita, Hemal, Reetuparna
 '''
 import json
 from rocksdict import Rdict
-import constants
+import rocksDB.constants
 from csv import reader
-import twitter_dataset as twitter
-import helper as bytes
+import rocksDB.twitter_dataset as twitter
+import rocksDB.helper as bytes
 import time
-import argparse
 import io
 import torch
 
-parser = argparse.ArgumentParser(description='Store dataset in RocksDB')
-parser.add_argument('--rows-per-key', type=int, default=1, help='The number of rows to be store within a key')
-args = parser.parse_args()
-
-class RocksDBLoader:
-    def __init__(self):
-        self.db = Rdict(constants.DB_PATH)
+class RocksDBStore:
+    def __init__(self, input_file, rows_per_key):
+        self.db = Rdict(rocksDB.constants.DB_PATH)
         self.num_keys = 0
         self.num_rows = 0
         self.data = []
         self.current_size = 0
-        self.target_size = args.rows_per_key
+        self.target_size = rows_per_key
+        self.input_file = input_file
     
     def convert_tensor_to_bytes(self, tensor_data):
         buff = io.BytesIO()
@@ -37,7 +34,7 @@ class RocksDBLoader:
     def store_data(self):
         key_index = 0
         
-        with open(constants.DATASET_PATH, 'r', encoding=constants.INPUT_FILE_ENCODING) as read_obj:
+        with open(self.input_file, 'r', encoding=rocksDB.constants.INPUT_FILE_ENCODING) as read_obj:
             csv_reader = reader(read_obj)
             
             for row_data in enumerate(csv_reader):
@@ -75,27 +72,30 @@ class RocksDBLoader:
 
     # Store the number of rows in this dataset
     def store_metadata(self):
-        self.db[constants.NUM_KEYS.encode()] = bytes.int_to_bytes(self.num_rows // self.target_size + (self.num_rows % self.target_size != 0))
-        self.db[constants.NUM_ROWS_PER_KEY.encode()] = bytes.int_to_bytes(self.target_size)
-        self.db[constants.NUM_ROWS_LAST_KEY.encode()] = bytes.int_to_bytes(self.num_rows % self.target_size)
-        self.db[constants.NUM_ROWS.encode()] = bytes.int_to_bytes(self.num_rows)
+        self.db[rocksDB.constants.NUM_KEYS.encode()] = bytes.int_to_bytes(self.num_rows // self.target_size + (self.num_rows % self.target_size != 0))
+        self.db[rocksDB.constants.NUM_ROWS_PER_KEY.encode()] = bytes.int_to_bytes(self.target_size)
+        self.db[rocksDB.constants.NUM_ROWS_LAST_KEY.encode()] = bytes.int_to_bytes(self.num_rows % self.target_size)
+        self.db[rocksDB.constants.NUM_ROWS.encode()] = bytes.int_to_bytes(self.num_rows)
 
     def cleanup(self):
         self.db.close()
 
 '''
-    Driver
+    Driver Example
 '''
-if __name__ == "__main__":
-    store = RocksDBLoader()
+# if __name__ == "__main__":
+#     input_file = '/mnt/data/dataset/twitter/twitter_sentiment_dataset.csv'
+#     num_of_input_rows_per_key = 1
 
-    start = time.time()
-    store.store_data()
-    store.store_metadata()
+#     store = RocksDBStore(input_file, num_of_input_rows_per_key)
 
-    end = time.time()
+#     start = time.time()
+#     store.store_data()
+#     store.store_metadata()
 
-    print(f'Elapsed time = {end - start}')
+#     end = time.time()
 
-    store.cleanup()
+#     print(f'Elapsed time = {end - start}')
+
+#     store.cleanup()
 
