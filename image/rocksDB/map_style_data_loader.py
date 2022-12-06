@@ -10,22 +10,22 @@ from rocksdict import Rdict
 from torch.utils.data import Dataset, DataLoader, get_worker_info
 import time
 import io
-import constants
-import helper as bytes
+import rocksDB.constants
+import rocksDB.helper as bytes
 
 class RocksDBMapStyleDataset(Dataset):
     def __init__(self):
-        self.db = Rdict(constants.DB_PATH)
-        self.num_rows_in_key = bytes.bytes_to_int(self.db[constants.NUM_OF_ROWS_IN_KEY.encode()])
+        self.db = Rdict(rocksDB.constants.DB_PATH)
+        self.num_rows_in_key = bytes.bytes_to_int(self.db[rocksDB.constants.NUM_OF_ROWS_IN_KEY.encode()])
         assert self.num_rows_in_key is not None 
-        self.image_dim = bytes.bytes_to_int(self.db[constants.IMAGE_DIM.encode()]) + 1
+        self.image_dim = bytes.bytes_to_int(self.db[rocksDB.constants.IMAGE_DIM.encode()]) + 1
         assert self.image_dim is not None 
         self.key_idx_in_mem = -1
         self.cache = torch.empty(self.num_rows_in_key, self.image_dim)
         self.count = 0
 
     def __len__(self):
-        val = self.db[constants.NUM_OF_IMAGES.encode()]
+        val = self.db[rocksDB.constants.NUM_OF_IMAGES.encode()]
         assert val is not None
         return bytes.bytes_to_int(val)
     

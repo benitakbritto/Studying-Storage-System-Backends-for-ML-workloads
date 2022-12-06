@@ -1,14 +1,9 @@
 import argparse
-from tile_db.TileDBIterableDataset import TileDBIterableDataset
-from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
 from torch.utils.data import DataLoader
-from tile_db.helper import get_dataset_count
-import tile_db.dump as tile_db_dump
 from rocksDB.store import RocksDBStore
 from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
-from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -52,30 +47,31 @@ start = None
 end = None
 
 if args.ds == 'rd':
+    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256
     # Store data in rocks db
     start = time.time()
 
-    store = RocksDBStore(args.input_file, args.input_rows_per_key)
+    store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
     store.store_data()
     store.store_metadata()
     
     end = time.time()
 
-    # Set Dataloader
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
-    if args.type == 'm':
-        dataset = RocksDBMapStyleDataset()
-        dataloader = DataLoader(
-            dataset,
-            batch_size=int(args.batch_size),
-            shuffle=False, 
-            num_workers=args.num_workers
-        )
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
-    elif args.type == 'i':
-        total_rows = store.get_total_input_rows()
-        dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-        dataloader = DataLoader(dataset=dataset, num_workers=0)
+    # # Set Dataloader
+    # # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
+    # if args.type == 'm':
+    #     dataset = RocksDBMapStyleDataset()
+    #     dataloader = DataLoader(
+    #         dataset,
+    #         batch_size=int(args.batch_size),
+    #         shuffle=False, 
+    #         num_workers=args.num_workers
+    #     )
+    # # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
+    # elif args.type == 'i':
+    #     total_rows = store.get_total_input_rows()
+    #     dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+    #     dataloader = DataLoader(dataset=dataset, num_workers=0)
     
     store.cleanup()
     
