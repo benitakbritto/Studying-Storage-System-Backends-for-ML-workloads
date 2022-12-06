@@ -34,7 +34,11 @@ parser.add_argument("-num-workers",
     help="Number of workers",
     default=0,
     required=False)
- 
+parser.add_argument("-batch-size",
+    help="Batch size for the dataloader",
+    default=256,
+    required=False)
+
 # Read arguments from command line
 args = parser.parse_args()
 
@@ -58,7 +62,7 @@ if args.ds == 'rd':
         dataset = RocksDBMapStyleDataset()
         dataloader = DataLoader(
             dataset,
-            batch_size=dataset.rows_in_key,
+            batch_size=int(args.batch_size),
             shuffle=False, 
             num_workers=args.num_workers
         )
@@ -81,7 +85,7 @@ elif args.ds == 'td':
 
     # prepare dataset and dataloader
     dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-    dataloader = DataLoader(dataset=dataset)
+    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 else:
     raise NotImplementedError("Not implemented")
 
