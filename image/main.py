@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from rocksDB.store import RocksDBStore
 from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
+from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -56,6 +57,7 @@ if args.ds == 'rd':
     
     end = time.time()
 
+    total_rows = store.get_total_input_rows()
     store.cleanup()
 
     # Set Dataloader
@@ -68,11 +70,11 @@ if args.ds == 'rd':
             shuffle=False, 
             num_workers=int(args.num_workers)
         )
-    # # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
-    # elif args.type == 'i':
-    #     total_rows = store.get_total_input_rows()
-    #     dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-    #     dataloader = DataLoader(dataset=dataset, num_workers=0)
+    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -type i -pf 256
+    elif args.type == 'i':
+        dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+        dataloader = DataLoader(dataset=dataset, num_workers=0)
+
 elif args.ds == 'td':
     raise NotImplementedError("Not implemented")
 else:
