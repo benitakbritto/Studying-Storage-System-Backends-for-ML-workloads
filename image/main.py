@@ -47,7 +47,6 @@ start = None
 end = None
 
 if args.ds == 'rd':
-    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256
     # Store data in rocks db
     start = time.time()
 
@@ -57,24 +56,23 @@ if args.ds == 'rd':
     
     end = time.time()
 
-    # # Set Dataloader
-    # # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
-    # if args.type == 'm':
-    #     dataset = RocksDBMapStyleDataset()
-    #     dataloader = DataLoader(
-    #         dataset,
-    #         batch_size=int(args.batch_size),
-    #         shuffle=False, 
-    #         num_workers=args.num_workers
-    #     )
+    store.cleanup()
+
+    # Set Dataloader
+    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256 
+    if args.type == 'm':
+        dataset = RocksDBMapStyleDataset()
+        dataloader = DataLoader(
+            dataset,
+            batch_size=int(args.batch_size),
+            shuffle=False, 
+            num_workers=int(args.num_workers)
+        )
     # # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
     # elif args.type == 'i':
     #     total_rows = store.get_total_input_rows()
     #     dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
     #     dataloader = DataLoader(dataset=dataset, num_workers=0)
-    
-    store.cleanup()
-    
 elif args.ds == 'td':
     raise NotImplementedError("Not implemented")
 else:

@@ -53,27 +53,4 @@ class RocksDBMapStyleDataset(Dataset):
             self.cache = self.get_data_from_db(key_index)
         
         return self.cache[offset]
-            
-if __name__ == "__main__":
-    NUM_WORKERS = 0
-    cifar = RocksDBDataset()
-    start = time.time()
-    
-    # TODO: Tweak these values
-    # Note: Must choose shuffle=False, else out of bounds
-    data_train = DataLoader(
-        cifar,
-        batch_size=cifar.num_rows_in_key,
-        shuffle=False, 
-        num_workers=NUM_WORKERS
-    )
-
-    i = 0
-    for batch_idx, samples in enumerate(data_train):
-        i = batch_idx
-    
-    end = time.time()
-    print(f'Elapsed time = {end - start}')
-
-    print(f'# calls to db = {cifar.count}')
         
