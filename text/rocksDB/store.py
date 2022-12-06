@@ -76,6 +76,11 @@ class RocksDBStore:
         self.db[rocksDB.constants.NUM_ROWS_PER_KEY.encode()] = bytes.int_to_bytes(self.target_size)
         self.db[rocksDB.constants.NUM_ROWS_LAST_KEY.encode()] = bytes.int_to_bytes(self.num_rows % self.target_size)
         self.db[rocksDB.constants.NUM_ROWS.encode()] = bytes.int_to_bytes(self.num_rows)
+    
+    def get_total_input_rows(self):
+        val = self.db[rocksDB.constants.NUM_ROWS.encode()]
+        assert val is not None
+        return bytes.bytes_to_int(val)
 
     def cleanup(self):
         self.db.close()
