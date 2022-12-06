@@ -1,9 +1,11 @@
 import argparse
+from tile_db.TileDBIterableDataset import TileDBIterableDataset
 import time
-from tiledb.TileDBIterableDataset import TileDBIterableDataset
 from torch.utils.data import DataLoader
-from tiledb.db_util import get_dataset_count
+from tile_db.helper import get_dataset_count
+import tile_db.dump as tile_db_dump
 from rocksDB.store import RocksDBStore
+from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
 
 # Initialize parser
@@ -32,12 +34,19 @@ parser.add_argument("-num-workers",
     help="Number of workers",
     default=0,
     required=False)
- 
+parser.add_argument("-batch-size",
+    help="Batch size for the dataloader",
+    default=256,
+    required=False)
+
 # Read arguments from command line
 args = parser.parse_args()
 
 dataset = None
 dataloader = None
+
+start = None
+end = None
 
 if args.ds == 'rd':
     # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m
@@ -49,7 +58,6 @@ if args.ds == 'rd':
     store.store_metadata()
     
     end = time.time()
-
     print(f'{args.ds} Store time = {end - start} s')
 
     # Set Dataloader
@@ -57,7 +65,7 @@ if args.ds == 'rd':
         dataset = RocksDBMapStyleDataset()
         dataloader = DataLoader(
             dataset,
-            batch_size=dataset.rows_in_key,
+            batch_size=int(args.batch_size),
             shuffle=False, 
             num_workers=args.num_workers
         )
@@ -69,10 +77,27 @@ if args.ds == 'rd':
     store.cleanup()
     
 elif args.ds == 'td':
-    dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
-    dataloader = DataLoader(dataset=dataset)
+    # dump to db
+    root_dir = str(Path(args.input_file).parent)
+
+    # switch to input file name from args
+    dataset_uri = args.input_file
+    tile_uri = root_dir + "twitter.tldb"
+
+    start = time.time()
+    tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+    end = time.time()
+
+    print(f'{args.ds} Store time = {end - start} s')
+
+    # prepare dataset and dataloader
+    dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 else:
     raise NotImplementedError("Not implemented")
+
+
+print(f'{args.ds} Write = {end - start} s')
 
 # Call dataloader
 start = time.time()

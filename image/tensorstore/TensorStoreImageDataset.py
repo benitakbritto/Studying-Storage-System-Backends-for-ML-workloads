@@ -1,3 +1,10 @@
+'''
+    @brief: TODO: Add better desc
+    @prereq: bash
+    @usage: python <filename>
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 from torch.utils.data import DataLoader, IterableDataset, get_worker_info
 import time
 import math

@@ -1,3 +1,10 @@
+'''
+    @brief: TODO: Add better desc
+    @prereq: bash
+    @usage: python <filename>
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 import tiledb
 import numpy as np
 

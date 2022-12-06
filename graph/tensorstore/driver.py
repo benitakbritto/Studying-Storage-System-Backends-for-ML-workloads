@@ -1,8 +1,14 @@
+'''
+    @brief: TODO: Add better desc
+    @prereq: bash
+    @usage: python <filename>
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 from torch.utils.data import DataLoader
 import time
 from db import TensorStoreDB
 from TensorStoreDataset import TensorStoreDataset
-import constants
 import asyncio
 
 '''
