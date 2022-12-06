@@ -1,7 +1,8 @@
 import argparse
-from tiledb.TileDBIterableDataset import TileDBIterableDataset
+from tile_db.TileDBIterableDataset import TileDBIterableDataset
 from torch.utils.data import DataLoader
-from tiledb.db_util import get_dataset_count
+from tile_db.helper import get_dataset_count
+import tile_db.dump as tile_db_dump
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -26,7 +27,17 @@ dataloader = None
 if args.ds == 'rd':
     raise NotImplementedError("Not implemented")
 elif args.ds == 'td':
-    dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
+    # dump to db
+    rootDir = "/mnt/data/dataset/twitter/"
+
+    # switch to input file name from args
+    dataset_uri = rootDir + "twitter_sentiment_dataset.csv"
+    tile_uri = rootDir + "twitter.tldb"
+
+    tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+
+    # prepare dataset and dataloader
+    dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
     dataloader = DataLoader(dataset=dataset)
 else:
     raise NotImplementedError("Not implemented")
