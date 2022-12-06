@@ -26,6 +26,7 @@ parser.add_argument("-input-file",
     help="Path to the input file stored in the filesystem",
     required=True)
 parser.add_argument("-input-rows-per-key",
+    default=1,
     help="Storing a batch of input rows under a single key",
     required=False)
 parser.add_argument("-type", 
@@ -70,7 +71,7 @@ if args.ds == 'rd':
             shuffle=False, 
             num_workers=args.num_workers
         )
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type i -batch-size 256 -pf 256
+    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
     elif args.type == 'i':
         total_rows = store.get_total_input_rows()
         dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
