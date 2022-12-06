@@ -31,7 +31,7 @@ class RocksDBIterableDataset(IterableDataset):
 # TODO: Does not work when num_workers > 0 due to db lock issue
 if __name__ == "__main__":
     # should give same set of data as range(3, 7), i.e., [3, 4, 5, 6].
-    ds = RocksDBIterableDataset(start=3, end=7, cache_len=100)
+    cacds = RocksDBIterableDataset(start=3, end=7, he_len=100)
     
     # run one at a time, too many tensor workers are causing issue
 

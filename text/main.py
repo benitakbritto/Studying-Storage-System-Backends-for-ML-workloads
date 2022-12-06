@@ -47,8 +47,7 @@ if args.ds == 'rd':
     store = RocksDBStore(args.input_file, args.input_rows_per_key)
     store.store_data()
     store.store_metadata()
-    store.cleanup()
-
+    
     end = time.time()
 
     print(f'{args.ds} Store time = {end - start} s')
@@ -63,7 +62,11 @@ if args.ds == 'rd':
             num_workers=args.num_workers
         )
     elif args.type == 'i':
-        raise NotImplementedError("Not implemented")
+        total_rows = store.get_total_input_rows()
+        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+        dataloader = DataLoader(dataset=dataset)
+    
+    store.cleanup()
     
 elif args.ds == 'td':
     dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
