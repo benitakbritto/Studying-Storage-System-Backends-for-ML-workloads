@@ -1,8 +1,10 @@
 import argparse
+import time
 from tiledb.TileDBIterableDataset import TileDBIterableDataset
 from torch.utils.data import DataLoader
 from tiledb.db_util import get_dataset_count
 from rocksDB.store import RocksDBStore
+from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -22,6 +24,14 @@ parser.add_argument("-input-file",
 parser.add_argument("-input-rows-per-key",
     help="Storing a batch of input rows under a single key",
     required=False)
+parser.add_argument("-type", 
+    help = "Type of dataloader. m for map style and i for iterable style.", 
+    choices=['m', 'i'],
+    required=True)
+parser.add_argument("-num-workers",
+    help="Number of workers",
+    default=0,
+    required=False)
  
 # Read arguments from command line
 args = parser.parse_args()
@@ -30,13 +40,30 @@ dataset = None
 dataloader = None
 
 if args.ds == 'rd':
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256
+    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m
     # Store data in rocks db
+    start = time.time()
+
     store = RocksDBStore(args.input_file, args.input_rows_per_key)
     store.store_data()
+    store.store_metadata()
     store.cleanup()
 
-    # Invoke Dataloader
+    end = time.time()
+
+    print(f'{args.ds} Store time = {end - start} s')
+
+    # Set Dataloader
+    if args.type == 'm':
+        dataset = RocksDBMapStyleDataset()
+        dataloader = DataLoader(
+            dataset,
+            batch_size=dataset.rows_in_key,
+            shuffle=False, 
+            num_workers=args.num_workers
+        )
+    elif args.type == 'i':
+        raise NotImplementedError("Not implemented")
     
 elif args.ds == 'td':
     dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
@@ -44,11 +71,14 @@ elif args.ds == 'td':
 else:
     raise NotImplementedError("Not implemented")
 
-for batch_idx, data in enumerate(dataloader):
-    if batch_idx > 10: 
-        break
+# Call dataloader
+start = time.time()
 
-    print(data)
+for batch_idx, data in enumerate(dataloader):
+    i = batch_idx
+
+end = time.time()
+print(f'{args.ds} Dataloader time = {end - start} s')
 
 
 
