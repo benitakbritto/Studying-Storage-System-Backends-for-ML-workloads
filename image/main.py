@@ -2,11 +2,10 @@ import argparse
 from tile_db.TileDBIterableDataset import TileDBIterableDataset
 from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
-from torch.utils.data import DataLoader
 from tile_db.helper import get_dataset_count
 import tile_db.dump_fast as tile_db_dump
+from torch.utils.data import DataLoader
 from rocksDB.store import RocksDBStore
-from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
 
 # Initialize parser
@@ -25,6 +24,7 @@ parser.add_argument("-input-file",
     help="Path to the input file stored in the filesystem",
     required=True)
 parser.add_argument("-input-rows-per-key",
+    default=1,
     help="Storing a batch of input rows under a single key",
     required=False)
 parser.add_argument("-type", 
@@ -50,18 +50,19 @@ start = None
 end = None
 
 if args.ds == 'rd':
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m
     # Store data in rocks db
     start = time.time()
 
-    store = RocksDBStore(args.input_file, args.input_rows_per_key)
+    store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
     store.store_data()
     store.store_metadata()
     
     end = time.time()
-    print(f'{args.ds} Store time = {end - start} s')
+
+    store.cleanup()
 
     # Set Dataloader
+    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256 
     if args.type == 'm':
         dataset = RocksDBMapStyleDataset()
         dataloader = DataLoader(
@@ -71,12 +72,7 @@ if args.ds == 'rd':
             num_workers=args.num_workers
         )
     elif args.type == 'i':
-        total_rows = store.get_total_input_rows()
-        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-        dataloader = DataLoader(dataset=dataset)
-    
-    store.cleanup()
-    pass
+        NotImplementedError("not implemented")
 elif args.ds == 'td':
     # dump to db
     root_dir = args.input_file
@@ -109,9 +105,3 @@ for batch_idx, data in enumerate(dataloader):
 
 end = time.time()
 print(f'{args.ds} Dataloader time = {end - start} s')
-
-
-
-
-
-

@@ -8,6 +8,7 @@ import tile_db.dump as tile_db_dump
 from rocksDB.store import RocksDBStore
 from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
+from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -25,6 +26,7 @@ parser.add_argument("-input-file",
     help="Path to the input file stored in the filesystem",
     required=True)
 parser.add_argument("-input-rows-per-key",
+    default=1,
     help="Storing a batch of input rows under a single key",
     required=False)
 parser.add_argument("-type", 
@@ -50,33 +52,34 @@ start = None
 end = None
 
 if args.ds == 'rd':
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m
     # Store data in rocks db
     start = time.time()
 
-    store = RocksDBStore(args.input_file, args.input_rows_per_key)
+    store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
     store.store_data()
     store.store_metadata()
     
     end = time.time()
-    print(f'{args.ds} Store time = {end - start} s')
+
+    total_rows = store.get_total_input_rows()
+    store.cleanup()
 
     # Set Dataloader
+    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
     if args.type == 'm':
         dataset = RocksDBMapStyleDataset()
         dataloader = DataLoader(
             dataset,
             batch_size=int(args.batch_size),
             shuffle=False, 
-            num_workers=args.num_workers
+            num_workers=int(args.num_workers)
         )
+    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
     elif args.type == 'i':
         total_rows = store.get_total_input_rows()
-        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-        dataloader = DataLoader(dataset=dataset)
-    
-    store.cleanup()
-    
+        dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+        dataloader = DataLoader(dataset=dataset, num_workers=0)
+
 elif args.ds == 'td':
     # dump to db
     root_dir = str(Path(args.input_file).parent)
