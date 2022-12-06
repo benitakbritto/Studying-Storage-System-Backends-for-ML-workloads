@@ -13,7 +13,7 @@ import io
 import constants
 import helper as bytes
 
-class RocksDBDataset(Dataset):
+class RocksDBMapStyleDataset(Dataset):
     def __init__(self):
         self.db = Rdict(constants.DB_PATH)
         self.num_rows_in_key = bytes.bytes_to_int(self.db[constants.NUM_OF_ROWS_IN_KEY.encode()])
