@@ -7,7 +7,7 @@
 
 import torch
 from rocksdict import Rdict
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 import helper as bytes
 import constants
 import json
@@ -28,7 +28,6 @@ class RocksDBDataset(Dataset):
     def __len__(self):
         val = self.db[constants.NUM_ROWS.encode()]
         assert val is not None
-        print(f'[DEBUG] len = {bytes.bytes_to_int(val)}')
         return bytes.bytes_to_int(val)
     
     def get_offset(self, idx):
@@ -44,8 +43,8 @@ class RocksDBDataset(Dataset):
         buff.seek(0)
         self.count += 1
         return torch.load(buff)
-    
-    # returns the head, relation, tail as a list of strings
+
+    # returns the text and target attribute from a row
     def __getitem__(self, idx):
         key_index = self.get_key_index(idx)
         offset = self.get_offset(idx)
@@ -53,18 +52,19 @@ class RocksDBDataset(Dataset):
         if self.key_idx_in_mem != key_index:
             self.key_idx_in_mem = key_index
             self.cache = self.get_data_from_db(key_index)
-            
+        
         val = self.cache[offset]
-        return val.split()
+        val = json.loads(val)
+        return val['text'], val['target']
         
 if __name__ == "__main__":
-    fb15k = RocksDBDataset()
+    twitter = RocksDBDataset()
     start = time.time()
     
     # TODO: Tweak these values
     data_train = torch.utils.data.DataLoader(
-        fb15k,
-        batch_size=fb15k.rows_in_key,
+        twitter,
+        batch_size=twitter.rows_in_key,
         shuffle=False, 
         num_workers=0
     )
@@ -76,4 +76,5 @@ if __name__ == "__main__":
     end = time.time()
     print(f'Elapsed time = {end - start}')
 
-    print(f'# calls to db = {fb15k.count}')
+    print(f'# calls to DB = {twitter.count}')
+        

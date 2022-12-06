@@ -29,7 +29,7 @@ def dump_to_db():
     data_train = DataLoader(
             input_data,
             batch_size = constants.BATCH_SIZE,
-            shuffle = False, 
+            shuffle = False,
             num_workers = 8
         )
 

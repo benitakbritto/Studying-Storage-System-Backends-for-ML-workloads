@@ -1,7 +1,7 @@
 '''
     @brief: TODO: Add better desc
     @prereq: bash
-    @usage: python <filename>
+    @usage: python <filename> --rows-per-key <num>
     @authors: Benita, Hemal, Reetuparna
 
     @resource: https://blog.jovian.ai/image-classification-of-cifar100-dataset-using-pytorch-8b7145242df1
@@ -13,14 +13,19 @@ import torchvision.transforms as tt
 import torch
 import tensorstore as ts
 from torch.utils.data import DataLoader
-import rocksdb3
+from rocksdict import Rdict
 import io
 import constants
 import time
+import argparse
+
+parser = argparse.ArgumentParser(description='Store dataset in RocksDB')
+parser.add_argument('--rows-per-key', type=int, default=1, help='The number of rows to be store within a key')
+args = parser.parse_args()
 
 class RocksDBStore:
     def __init__(self):
-        self.db = rocksdb3.open_default(constants.DB_PATH)
+        self.db = Rdict(constants.DB_PATH)
         self.train_data_len = 0
 
     def convert_tensor_to_bytes(self, tensor_data):
@@ -53,7 +58,7 @@ class RocksDBStore:
 
         # TODO: Tweak these values
         data_train = DataLoader(train_data,
-                        constants.BATCH_SIZE,
+                        args.rows_per_key,
                         num_workers=4,
                         pin_memory=True,
                         shuffle=True)
@@ -67,20 +72,17 @@ class RocksDBStore:
             value_in_tensor = torch.cat((images, labels), -1)
             value_in_bytes = self.convert_tensor_to_bytes(value_in_tensor)
             key_in_bytes = self.int_to_bytes(batch_idx)
-            self.db.put(key_in_bytes, value_in_bytes)
+            self.db[key_in_bytes] = value_in_bytes
 
     def store_metadata(self):
-        self.db.put('BATCH_SIZE'.encode(), self.int_to_bytes(constants.BATCH_SIZE))
-        self.db.put('IMAGE_DIM'.encode(), self.int_to_bytes(3*32*32))
-        num_batches = (int) (self.train_data_len / constants.BATCH_SIZE)
-        self.db.put('NUM_OF_IMAGES'.encode(), self.int_to_bytes(self.train_data_len))
-        self.db.put('LAST_BATCH_SIZE'.encode(), self.int_to_bytes(self.train_data_len - num_batches * constants.BATCH_SIZE))
-        self.db.put('NUM_BATCHES'.encode(), self.int_to_bytes(num_batches))
+        self.db[constants.NUM_OF_ROWS_IN_KEY.encode()] = self.int_to_bytes(args.rows_per_key)
+        self.db[constants.IMAGE_DIM.encode()] = self.int_to_bytes(3*32*32)
+        self.db[constants.NUM_OF_IMAGES.encode()] = self.int_to_bytes(self.train_data_len)
+        self.db[constants.ROWS_LAST_KEY.encode()] = self.int_to_bytes(self.train_data_len % args.rows_per_key)
+        self.db[constants.NUM_KEYS.encode()] = self.int_to_bytes((int)(self.train_data_len / args.rows_per_key) + (self.train_data_len % args.rows_per_key != 0))
 
-    # For debugging
-    def delete_db(self):
-        del self.db
-        rocksdb3.destroy(constants.DB_PATH)           
+    def cleanup(self):
+        self.db.close()
 
 if __name__ == "__main__":
     store_obj = RocksDBStore()
@@ -92,3 +94,5 @@ if __name__ == "__main__":
     
     end = time.time()
     print(f'Elapsed time = {end - start}')
+
+    store_obj.cleanup()
