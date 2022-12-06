@@ -1,3 +1,11 @@
+'''
+    @brief: TODO: Add better desc
+    @prereq: bash
+    @usage: python <filename>
+    @authors: Benita, Hemal, Reetuparna
+'''
+
+
 from torch.utils.data import Dataset, DataLoader
 import tensorstore as ts
 import constants

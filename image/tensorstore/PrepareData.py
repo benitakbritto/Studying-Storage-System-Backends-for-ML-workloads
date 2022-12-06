@@ -1,3 +1,10 @@
+'''
+    @brief: TODO: Add better desc
+    @prereq: bash
+    @usage: python <filename>
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 from torchvision.datasets import CIFAR100
 import torchvision.transforms as tt
 import constants
