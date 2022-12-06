@@ -1,5 +1,6 @@
 import argparse
 from tile_db.TileDBIterableDataset import TileDBIterableDataset
+from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
 from torch.utils.data import DataLoader
 from tile_db.helper import get_dataset_count
@@ -84,7 +85,11 @@ elif args.ds == 'td':
     print(f'{args.ds} Store time = {end - start} s')
 
     # prepare dataset and dataloader
-    dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+    if args.type == 'm':
+        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+    elif args.type == 'i':
+        dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+
     dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 else:
     raise NotImplementedError("Not implemented")
