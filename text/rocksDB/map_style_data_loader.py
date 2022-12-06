@@ -1,32 +1,32 @@
 '''
-    @brief: TODO: Add better desc
+    @brief: Map style Data loader
     @prereq: bash
-    @usage: python <filename>
+    @usage: from main.py
     @authors: Benita, Hemal, Reetuparna
 '''
 
 import torch
 from rocksdict import Rdict
 from torch.utils.data import Dataset, DataLoader
-import helper as bytes
-import constants
+import rocksDB.helper as bytes
+import rocksDB.constants
 import json
 import time
 import io
 
-class RocksDBDataset(Dataset):
+class RocksDBMapStyleDataset(Dataset):
     def __init__(self):
-        self.db = Rdict(constants.DB_PATH)
-        self.num_keys = bytes.bytes_to_int(self.db[constants.NUM_KEYS.encode()])
-        print(f'[DEBUG] num_keys = {self.num_keys}')
-        self.rows_in_key = bytes.bytes_to_int(self.db[constants.NUM_ROWS_PER_KEY.encode()])
-        print(f'[DEBUG] rows_in_key = {self.rows_in_key}')
+        self.db = Rdict(rocksDB.constants.DB_PATH)
+        self.num_keys = bytes.bytes_to_int(self.db[rocksDB.constants.NUM_KEYS.encode()])
+        # print(f'[DEBUG] num_keys = {self.num_keys}')
+        self.rows_in_key = bytes.bytes_to_int(self.db[rocksDB.constants.NUM_ROWS_PER_KEY.encode()])
+        # print(f'[DEBUG] rows_in_key = {self.rows_in_key}')
         self.cache = []
         self.count = 0
         self.key_idx_in_mem = -1
 
     def __len__(self):
-        val = self.db[constants.NUM_ROWS.encode()]
+        val = self.db[rocksDB.constants.NUM_ROWS.encode()]
         assert val is not None
         return bytes.bytes_to_int(val)
     
@@ -56,25 +56,27 @@ class RocksDBDataset(Dataset):
         val = self.cache[offset]
         val = json.loads(val)
         return val['text'], val['target']
-        
-if __name__ == "__main__":
-    twitter = RocksDBDataset()
-    start = time.time()
-    
-    # TODO: Tweak these values
-    data_train = torch.utils.data.DataLoader(
-        twitter,
-        batch_size=twitter.rows_in_key,
-        shuffle=False, 
-        num_workers=0
-    )
 
-    i = 0
-    for batch_idx, samples in enumerate(data_train):
-        i = batch_idx
+'''
+    Driver example
+'''
+# if __name__ == "__main__":
+#     dataset = RocksDBMapStyleDataset()
+#     start = time.time()
     
-    end = time.time()
-    print(f'Elapsed time = {end - start}')
+#     dataloader = torch.utils.data.DataLoader(
+#         dataset,
+#         batch_size=dataset.rows_in_key,
+#         shuffle=False, 
+#         num_workers=0
+#     )
 
-    print(f'# calls to DB = {twitter.count}')
+#     i = 0
+#     for batch_idx, samples in enumerate(dataloader):
+#         i = batch_idx
+    
+#     end = time.time()
+#     print(f'Elapsed time = {end - start}')
+
+#     print(f'# calls to DB = {twitter.count}')
         
