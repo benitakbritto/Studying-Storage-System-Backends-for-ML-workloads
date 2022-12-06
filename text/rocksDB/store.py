@@ -22,7 +22,7 @@ class RocksDBStore:
         self.num_rows = 0
         self.data = []
         self.current_size = 0
-        self.target_size = rows_per_key
+        self.target_size = int(rows_per_key)
         self.input_file = input_file
     
     def convert_tensor_to_bytes(self, tensor_data):
@@ -68,7 +68,7 @@ class RocksDBStore:
             key_in_bytes = bytes.int_to_bytes(key_index)
             self.db[key_in_bytes] = self.convert_tensor_to_bytes(self.data)
         
-        print(f'[DEBUG] At end of function, nums_rows = {self.num_rows}')
+        # print(f'[DEBUG] At end of function, nums_rows = {self.num_rows}')
 
     # Store the number of rows in this dataset
     def store_metadata(self):
