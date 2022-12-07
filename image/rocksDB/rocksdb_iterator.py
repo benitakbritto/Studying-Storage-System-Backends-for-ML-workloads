@@ -5,7 +5,7 @@
     @authors: Benita, Hemal, Reetuparna
 '''
 
-from rocksdict import Rdict
+from rocksdict import Rdict, AccessType
 import rocksDB.constants
 import rocksDB.helper as bytes
 import io
@@ -13,7 +13,8 @@ import torch
 
 class RocksDBIterator():
     def __init__(self, cache_len, start, end):
-        self.db = Rdict(rocksDB.constants.DB_PATH)
+        self.db = Rdict(rocksDB.constants.DB_PATH, 
+            access_type = AccessType.read_only(False))
 
         # cache stores
         self.image_with_label = []

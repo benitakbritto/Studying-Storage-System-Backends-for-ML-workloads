@@ -86,14 +86,13 @@ def run_test():
                 dataloader = DataLoader(
                     dataset,
                     batch_size=int(args.batch_size),
-                    shuffle=False, 
                     num_workers=int(args.num_workers)
                 )
 
             elif args.type == 'i':
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, 
-                    num_workers=0, 
+                    num_workers=int(args.num_workers), 
                     batch_size=int(args.batch_size))
 
         elif args.ds == 'td':
@@ -143,7 +142,6 @@ def run_test():
                 dataloader = DataLoader(
                     dataset,
                     batch_size = int(args.batch_size), 
-                    shuffle=False, 
                     num_workers=int(args.num_workers)
                 )
             elif args.type == 'i':
