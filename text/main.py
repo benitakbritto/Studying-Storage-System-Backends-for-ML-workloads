@@ -101,7 +101,9 @@ def run_test():
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), 
                     start=0, 
                     end=int(total_rows))
-                dataloader = DataLoader(dataset=dataset, num_workers=0)
+                dataloader = DataLoader(dataset=dataset, 
+                    num_workers=0, 
+                    batch_size=int(args.batch_size))
 
         elif args.ds == 'td':
             dataset = TileDBIterableDataset(cache_len=args.pf, 
@@ -134,8 +136,8 @@ def run_test():
                     tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, 
-                batch_size=int(args.batch_size, 
-                num_workers=int(args.num_workers)))
+                batch_size=int(args.batch_size), 
+                num_workers=int(args.num_workers))
 
         elif args.ds == 'ts':
             ## Example: python main.py -ds ts -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type m -batch-size 10000 -num-workers 8

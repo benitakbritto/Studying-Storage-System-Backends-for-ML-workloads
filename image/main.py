@@ -94,7 +94,9 @@ def run_test():
             # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -type i -pf 256
             elif args.type == 'i':
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-                dataloader = DataLoader(dataset=dataset, num_workers=0)
+                dataloader = DataLoader(dataset=dataset, 
+                    num_workers=0, 
+                    batch_size=int(args.batch_size))
 
         elif args.ds == 'td':
             # dump to db
