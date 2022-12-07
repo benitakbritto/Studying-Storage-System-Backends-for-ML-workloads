@@ -56,27 +56,3 @@ class RocksDBMapStyleDataset(Dataset):
         val = self.cache[offset]
         val = json.loads(val)
         return val['text'], val['target']
-
-'''
-    Driver example
-'''
-# if __name__ == "__main__":
-#     dataset = RocksDBMapStyleDataset()
-#     start = time.time()
-    
-#     dataloader = torch.utils.data.DataLoader(
-#         dataset,
-#         batch_size=dataset.rows_in_key,
-#         shuffle=False, 
-#         num_workers=0
-#     )
-
-#     i = 0
-#     for batch_idx, samples in enumerate(dataloader):
-#         i = batch_idx
-    
-#     end = time.time()
-#     print(f'Elapsed time = {end - start}')
-
-#     print(f'# calls to DB = {twitter.count}')
-        

@@ -1,12 +1,12 @@
 import tiledb
-import constants  as constants
+import numpy as np
 
 class TileDBIterator():
-    def __init__(self, cache_len, start, end):
+    def __init__(self, cache_len, start, end, tile_uri):
+        self.tile_uri = tile_uri
         # cache stores
-        self.head = []
-        self.edge = []
-        self.tail = []
+        self.label = []
+        self.im = []
 
         self.curr_idx = start
         self.end_idx = end
@@ -28,22 +28,25 @@ class TileDBIterator():
         # pre-fetch
         elif self.curr_idx >= self.last_exclusive_idx:
             # print('fetching:', self.curr_idx)
-            with tiledb.open(constants.tileUri, 'r') as A:
+            with tiledb.open(self.tile_uri, 'r') as A:
                 # find last index to fetch(exclusive)
                 self.last_exclusive_idx = min(self.curr_idx + self.cache_len, self.end_idx)
 
                 # bulk fetch
-                data = A.query(attrs=("head", "edge", "tail"), coords=False, order='G')[self.curr_idx: self.last_exclusive_idx]
-                
+                data = A.query(attrs=("im", "label"), coords=False, order='G')[self.curr_idx: self.last_exclusive_idx]
+
                 # cache store
-                self.head = data['head']
-                self.edge = data['edge']
-                self.tail = data['tail']
+                self.im = data['im']
+                # we stored as tuple, now transform back to array
+                self.im = np.array([list(t) for t in self.im])
+                
+                # import pdb; pdb.set_trace()
+                self.label = data['label']
                 
         # find the relative index within cache data
-        relative_idx = self.curr_idx % len(self.head)
+        relative_idx = self.curr_idx % len(self.label)
         
         # advance to next index
         self.curr_idx = self.curr_idx + 1
 
-        return self.head[relative_idx], self.edge[relative_idx], self.tail[relative_idx]
+        return self.label[relative_idx], self.im[relative_idx]

@@ -1,7 +1,7 @@
 '''
-    @brief: TODO: Add better desc
+    @brief: Read data from filesystem and store in storage backend
     @prereq: bash
-    @usage: python <filename> --rows-per-key <num>
+    @usage: from main.py
     @authors: Benita, Hemal, Reetuparna
 
     @resource: https://blog.jovian.ai/image-classification-of-cifar100-dataset-using-pytorch-8b7145242df1
@@ -15,18 +15,16 @@ import tensorstore as ts
 from torch.utils.data import DataLoader
 from rocksdict import Rdict
 import io
-import constants
+import rocksDB.constants
 import time
-import argparse
-
-parser = argparse.ArgumentParser(description='Store dataset in RocksDB')
-parser.add_argument('--rows-per-key', type=int, default=1, help='The number of rows to be store within a key')
-args = parser.parse_args()
+import rocksDB.helper as bytes
 
 class RocksDBStore:
-    def __init__(self):
-        self.db = Rdict(constants.DB_PATH)
+    def __init__(self, input_file, rows_per_key):
+        self.db = Rdict(rocksDB.constants.DB_PATH)
         self.train_data_len = 0
+        self.input_file = input_file
+        self.rows_per_key = rows_per_key
 
     def convert_tensor_to_bytes(self, tensor_data):
         buff = io.BytesIO()
@@ -52,13 +50,12 @@ class RocksDBStore:
 
         # Read data
         train_data = CIFAR100(download=True,
-                        root=constants.DATASET_PATH,
+                        root=self.input_file,
                         transform=train_transform)
         self.train_data_len = len(train_data)
 
-        # TODO: Tweak these values
         data_train = DataLoader(train_data,
-                        args.rows_per_key,
+                        self.rows_per_key,
                         num_workers=4,
                         pin_memory=True,
                         shuffle=True)
@@ -75,11 +72,16 @@ class RocksDBStore:
             self.db[key_in_bytes] = value_in_bytes
 
     def store_metadata(self):
-        self.db[constants.NUM_OF_ROWS_IN_KEY.encode()] = self.int_to_bytes(args.rows_per_key)
-        self.db[constants.IMAGE_DIM.encode()] = self.int_to_bytes(3*32*32)
-        self.db[constants.NUM_OF_IMAGES.encode()] = self.int_to_bytes(self.train_data_len)
-        self.db[constants.ROWS_LAST_KEY.encode()] = self.int_to_bytes(self.train_data_len % args.rows_per_key)
-        self.db[constants.NUM_KEYS.encode()] = self.int_to_bytes((int)(self.train_data_len / args.rows_per_key) + (self.train_data_len % args.rows_per_key != 0))
+        self.db[rocksDB.constants.NUM_OF_ROWS_IN_KEY.encode()] = self.int_to_bytes(self.rows_per_key)
+        self.db[rocksDB.constants.IMAGE_DIM.encode()] = self.int_to_bytes(3*32*32)
+        self.db[rocksDB.constants.NUM_OF_IMAGES.encode()] = self.int_to_bytes(self.train_data_len)
+        self.db[rocksDB.constants.ROWS_LAST_KEY.encode()] = self.int_to_bytes(self.train_data_len % self.rows_per_key)
+        self.db[rocksDB.constants.NUM_KEYS.encode()] = self.int_to_bytes((int)(self.train_data_len / self.rows_per_key) + (self.train_data_len % self.rows_per_key != 0))
+
+    def get_total_input_rows(self):
+        val = self.db[rocksDB.constants.NUM_OF_IMAGES.encode()]
+        assert val is not None
+        return bytes.bytes_to_int(val)
 
     def cleanup(self):
         self.db.close()

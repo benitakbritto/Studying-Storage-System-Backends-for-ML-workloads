@@ -1,4 +1,3 @@
-DATASET_PATH = "../../../../../../mnt/data/dataset/cifar/"
 DB_PATH = "./db_path"
 NUM_OF_ROWS_IN_KEY = 'NUM_OF_ROWS_IN_KEY'
 IMAGE_DIM = 'IMAGE_DIM'

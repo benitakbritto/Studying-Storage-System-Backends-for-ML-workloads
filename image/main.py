@@ -2,14 +2,11 @@ import argparse
 from tile_db.TileDBIterableDataset import TileDBIterableDataset
 from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
-from torch.utils.data import DataLoader
 from tile_db.helper import get_dataset_count
-import tile_db.dump as tile_db_dump
+import tile_db.dump_fast as tile_db_dump
+from torch.utils.data import DataLoader
 from rocksDB.store import RocksDBStore
-from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
-from tensor.store import TSStore
-from tensor.TensorStoreDataset import TensorStoreDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
 # Initialize parser
@@ -67,33 +64,30 @@ if args.ds == 'rd':
     store.cleanup()
 
     # Set Dataloader
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
+    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256 
     if args.type == 'm':
         dataset = RocksDBMapStyleDataset()
         dataloader = DataLoader(
             dataset,
             batch_size=int(args.batch_size),
             shuffle=False, 
-            num_workers=int(args.num_workers)
+            num_workers=args.num_workers
         )
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
+    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -type i -pf 256
     elif args.type == 'i':
         dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
         dataloader = DataLoader(dataset=dataset, num_workers=0)
 
 elif args.ds == 'td':
-    dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
-    dataloader = DataLoader(dataset=dataset)
-
     # dump to db
-    root_dir = str(Path(args.input_file).parent)
-
-    # switch to input file name from args
-    dataset_uri = args.input_file
-    tile_uri = root_dir + "twitter.tldb"
+    root_dir = args.input_file
+    tile_uri = root_dir + "/cifar100.tldb"
 
     start = time.time()
-    tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+    tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
+    end = time.time()
+
+    print(f'{args.ds} Store time = {end - start} s')
 
     # prepare dataset and dataloader
     if args.type == 'm':
@@ -102,37 +96,6 @@ elif args.ds == 'td':
         dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
 
     dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
-
-elif args.ds == 'ts':
-    start = time.time()
-
-    store = TSStore(args.input_file)
-    # store.cleanup()
-    # Ingest data
-    loop = asyncio.get_event_loop()
-    start = time.time()
-    task = [loop.create_task(store.ingestData())]
-
-    loop.run_until_complete(asyncio.wait(task)) 
-    loop.close()
-
-    end = time.time()
-
-    print(f'{args.ds} Store time = {end - start} s')
-
-    # Set Dataloader
-    if args.type == 'm':
-        dataset = TensorStoreDataset(store)
-        dataloader = DataLoader(
-            dataset,
-            batch_size = int(args.input_rows_per_key), 
-            shuffle=False, 
-            num_workers=args.num_workers
-        )
-    elif args.type == 'i':
-        raise NotImplementedError("Not implemented")
-
-   
 else:
     raise NotImplementedError("Not implemented")
 
@@ -147,9 +110,3 @@ for batch_idx, data in enumerate(dataloader):
 
 end = time.time()
 print(f'{args.ds} Dataloader time = {end - start} s')
-
-
-
-
-
-

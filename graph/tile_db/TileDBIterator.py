@@ -1,12 +1,12 @@
 import tiledb
-import constants  as constants
-import numpy as np
 
 class TileDBIterator():
-    def __init__(self, cache_len, start, end):
+    def __init__(self, cache_len, start, end, tile_uri):
+        self.tile_uri = tile_uri
         # cache stores
-        self.label = []
-        self.im = []
+        self.head = []
+        self.edge = []
+        self.tail = []
 
         self.curr_idx = start
         self.end_idx = end
@@ -28,32 +28,22 @@ class TileDBIterator():
         # pre-fetch
         elif self.curr_idx >= self.last_exclusive_idx:
             # print('fetching:', self.curr_idx)
-            with tiledb.open(constants.tileUri, 'r') as A:
+            with tiledb.open(self.tile_uri, 'r') as A:
                 # find last index to fetch(exclusive)
                 self.last_exclusive_idx = min(self.curr_idx + self.cache_len, self.end_idx)
 
                 # bulk fetch
-                data = A.query(attrs=("im", "label"), coords=False, order='G')[self.curr_idx: self.last_exclusive_idx]
-
-                # cache store
-                self.im = data['im']
-                # we stored as tuple, now transform back to array
-                self.im = np.array([list(t) for t in self.im])
+                data = A.query(attrs=("head", "edge", "tail"), coords=False, order='G')[self.curr_idx: self.last_exclusive_idx]
                 
-                # import pdb; pdb.set_trace()
-                self.label = data['label']
+                # cache store
+                self.head = data['head']
+                self.edge = data['edge']
+                self.tail = data['tail']
                 
         # find the relative index within cache data
-        relative_idx = self.curr_idx % len(self.label)
+        relative_idx = self.curr_idx % len(self.head)
         
         # advance to next index
         self.curr_idx = self.curr_idx + 1
 
-        return self.label[relative_idx], self.im[relative_idx]
-
-
-if __name__ == "__main__":
-    it = TileDBIterator(start=0, end=5, cache_len=2)
-
-    for item in it:
-        print(item)
+        return self.head[relative_idx], self.edge[relative_idx], self.tail[relative_idx]

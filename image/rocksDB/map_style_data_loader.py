@@ -10,22 +10,22 @@ from rocksdict import Rdict
 from torch.utils.data import Dataset, DataLoader, get_worker_info
 import time
 import io
-import constants
-import helper as bytes
+import rocksDB.constants
+import rocksDB.helper as bytes
 
-class RocksDBDataset(Dataset):
+class RocksDBMapStyleDataset(Dataset):
     def __init__(self):
-        self.db = Rdict(constants.DB_PATH)
-        self.num_rows_in_key = bytes.bytes_to_int(self.db[constants.NUM_OF_ROWS_IN_KEY.encode()])
+        self.db = Rdict(rocksDB.constants.DB_PATH)
+        self.num_rows_in_key = bytes.bytes_to_int(self.db[rocksDB.constants.NUM_OF_ROWS_IN_KEY.encode()])
         assert self.num_rows_in_key is not None 
-        self.image_dim = bytes.bytes_to_int(self.db[constants.IMAGE_DIM.encode()]) + 1
+        self.image_dim = bytes.bytes_to_int(self.db[rocksDB.constants.IMAGE_DIM.encode()]) + 1
         assert self.image_dim is not None 
         self.key_idx_in_mem = -1
         self.cache = torch.empty(self.num_rows_in_key, self.image_dim)
         self.count = 0
 
     def __len__(self):
-        val = self.db[constants.NUM_OF_IMAGES.encode()]
+        val = self.db[rocksDB.constants.NUM_OF_IMAGES.encode()]
         assert val is not None
         return bytes.bytes_to_int(val)
     
@@ -53,27 +53,4 @@ class RocksDBDataset(Dataset):
             self.cache = self.get_data_from_db(key_index)
         
         return self.cache[offset]
-            
-if __name__ == "__main__":
-    NUM_WORKERS = 0
-    cifar = RocksDBDataset()
-    start = time.time()
-    
-    # TODO: Tweak these values
-    # Note: Must choose shuffle=False, else out of bounds
-    data_train = DataLoader(
-        cifar,
-        batch_size=cifar.num_rows_in_key,
-        shuffle=False, 
-        num_workers=NUM_WORKERS
-    )
-
-    i = 0
-    for batch_idx, samples in enumerate(data_train):
-        i = batch_idx
-    
-    end = time.time()
-    print(f'Elapsed time = {end - start}')
-
-    print(f'# calls to db = {cifar.count}')
         

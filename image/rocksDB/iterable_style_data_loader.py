@@ -1,6 +1,6 @@
 import math
 from time import sleep
-from rocksdb_iterator import RocksDBIterator
+from rocksDB.rocksdb_iterator import RocksDBIterator
 from torch.utils.data import IterableDataset, DataLoader, get_worker_info
 
 '''
