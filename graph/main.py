@@ -3,7 +3,7 @@ import asyncio
 from pathlib import Path
 from tile_db.TileDBIterableDataset import TileDBIterableDataset
 from tile_db.TileDBMapDataset import TileDBMapDataset
-import time
+import time, os, shutil
 from torch.utils.data import DataLoader
 import tile_db.dump_fast as tile_db_dump
 from tile_db.helper import get_dataset_count
@@ -90,6 +90,10 @@ elif args.ds == 'td':
     dataset_uri = args.input_file
     tile_uri = root_dir + "fb15k-237.tldb"
 
+    # destroy path
+    if os.path.exists(tile_uri):
+        shutil.rmtree(tile_uri)
+
     start = time.time()
     tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
     end = time.time()
@@ -97,12 +101,12 @@ elif args.ds == 'td':
     print(f'{args.ds} Store time = {end - start} s')
 
     # prepare dataset and dataloader
-    if args.type == 'm':
+    if args.type == 'i':
         dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-    elif args.type == 'i':
+    elif args.type == 'm':
         dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
 
-    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
 elif args.ds == 'ts':
     ### Example: python main.py -ds ts -input-file /mnt/data/dataset/fb15k-237/train.txt  -type m -batch-size 256 -num-workers 8

@@ -1,5 +1,7 @@
 import argparse
 import asyncio
+import os
+import shutil
 from tile_db.TileDBIterableDataset import TileDBIterableDataset
 from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
@@ -100,16 +102,20 @@ def run_test():
             dataset_uri = args.input_file
             tile_uri = root_dir + "twitter.tldb"
 
+            # destroy path
+            if os.path.exists(tile_uri):
+                shutil.rmtree(tile_uri)
+
             start = time.time()
             tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
 
             # prepare dataset and dataloader
-            if args.type == 'm':
+            if args.type == 'i':
                 dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-            elif args.type == 'i':
+            elif args.type == 'm':
                 dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
 
-            dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+            dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
         elif args.ds == 'ts':
             ## Example: python main.py -ds ts -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type m -batch-size 10000 -num-workers 8
