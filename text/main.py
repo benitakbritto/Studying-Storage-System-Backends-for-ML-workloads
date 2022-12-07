@@ -76,7 +76,6 @@ if args.ds == 'rd':
         )
     # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
     elif args.type == 'i':
-        total_rows = store.get_total_input_rows()
         dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
         dataloader = DataLoader(dataset=dataset, num_workers=0)
 

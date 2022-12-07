@@ -1,12 +1,12 @@
 from rocksdict import Rdict
-import constants
-import helper as bytes
+import rocksDB.constants
+import rocksDB.helper as bytes
 import io
 import torch
 
 class RocksDBIterator():
     def __init__(self, cache_len, start, end):
-        self.db = Rdict(constants.DB_PATH)
+        self.db = Rdict(rocksDB.constants.DB_PATH)
 
         # cache stores
         self.image_with_label = []

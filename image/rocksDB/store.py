@@ -17,6 +17,7 @@ from rocksdict import Rdict
 import io
 import rocksDB.constants
 import time
+import rocksDB.helper as bytes
 
 class RocksDBStore:
     def __init__(self, input_file, rows_per_key):
@@ -76,6 +77,11 @@ class RocksDBStore:
         self.db[rocksDB.constants.NUM_OF_IMAGES.encode()] = self.int_to_bytes(self.train_data_len)
         self.db[rocksDB.constants.ROWS_LAST_KEY.encode()] = self.int_to_bytes(self.train_data_len % self.rows_per_key)
         self.db[rocksDB.constants.NUM_KEYS.encode()] = self.int_to_bytes((int)(self.train_data_len / self.rows_per_key) + (self.train_data_len % self.rows_per_key != 0))
+
+    def get_total_input_rows(self):
+        val = self.db[rocksDB.constants.NUM_OF_IMAGES.encode()]
+        assert val is not None
+        return bytes.bytes_to_int(val)
 
     def cleanup(self):
         self.db.close()
