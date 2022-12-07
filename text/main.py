@@ -1,10 +1,13 @@
 import argparse
 import time
+import asyncio
 from tiledb.TileDBIterableDataset import TileDBIterableDataset
 from torch.utils.data import DataLoader
 from tiledb.db_util import get_dataset_count
 from rocksDB.store import RocksDBStore
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
+from tensor.store import TSStore
+from tensor.TensorStoreDataset import TensorStoreDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -68,6 +71,36 @@ if args.ds == 'rd':
 elif args.ds == 'td':
     dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
     dataloader = DataLoader(dataset=dataset)
+
+elif args.ds == 'ts':
+    start = time.time()
+
+    store = TSStore(args.input_file)
+    # store.cleanup()
+    # Ingest data
+    loop = asyncio.get_event_loop()
+    start = time.time()
+    task = [loop.create_task(store.ingestData())]
+
+    loop.run_until_complete(asyncio.wait(task)) 
+    loop.close()
+
+    end = time.time()
+
+    print(f'{args.ds} Store time = {end - start} s')
+
+    # Set Dataloader
+    if args.type == 'm':
+        dataset = TensorStoreDataset(store)
+        dataloader = DataLoader(
+            dataset,
+            batch_size = int(args.input_rows_per_key), 
+            shuffle=False, 
+            num_workers=args.num_workers
+        )
+    elif args.type == 'i':
+        raise NotImplementedError("Not implemented")
+
 else:
     raise NotImplementedError("Not implemented")
 
