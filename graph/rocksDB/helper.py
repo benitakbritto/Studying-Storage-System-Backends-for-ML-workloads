@@ -1,7 +1,5 @@
 '''
-    @brief: TODO: Add better desc
-    @prereq: bash
-    @usage: python <filename>
+    @brief: Integer to Bytes and vice versa
     @authors: Benita, Hemal, Reetuparna
 '''
 

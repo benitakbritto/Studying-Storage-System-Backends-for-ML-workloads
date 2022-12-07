@@ -8,6 +8,8 @@ import tile_db.dump as tile_db_dump
 from rocksDB.store import RocksDBStore
 from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
+from tensor.store import TSStore
+from tensor.TensorStoreDataset import TensorStoreDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
 # Initialize parser
@@ -80,6 +82,9 @@ if args.ds == 'rd':
         dataloader = DataLoader(dataset=dataset, num_workers=0)
 
 elif args.ds == 'td':
+    dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
+    dataloader = DataLoader(dataset=dataset)
+
     # dump to db
     root_dir = str(Path(args.input_file).parent)
 
@@ -89,9 +94,6 @@ elif args.ds == 'td':
 
     start = time.time()
     tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
-    end = time.time()
-
-    print(f'{args.ds} Store time = {end - start} s')
 
     # prepare dataset and dataloader
     if args.type == 'm':
@@ -100,6 +102,37 @@ elif args.ds == 'td':
         dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
 
     dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+
+elif args.ds == 'ts':
+    start = time.time()
+
+    store = TSStore(args.input_file)
+    # store.cleanup()
+    # Ingest data
+    loop = asyncio.get_event_loop()
+    start = time.time()
+    task = [loop.create_task(store.ingestData())]
+
+    loop.run_until_complete(asyncio.wait(task)) 
+    loop.close()
+
+    end = time.time()
+
+    print(f'{args.ds} Store time = {end - start} s')
+
+    # Set Dataloader
+    if args.type == 'm':
+        dataset = TensorStoreDataset(store)
+        dataloader = DataLoader(
+            dataset,
+            batch_size = int(args.input_rows_per_key), 
+            shuffle=False, 
+            num_workers=args.num_workers
+        )
+    elif args.type == 'i':
+        raise NotImplementedError("Not implemented")
+
+   
 else:
     raise NotImplementedError("Not implemented")
 
