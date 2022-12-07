@@ -1,9 +1,9 @@
 import tiledb
-import constants  as constants
 import numpy as np
 
 class TileDBIterator():
-    def __init__(self, cache_len, start, end):
+    def __init__(self, cache_len, start, end, tile_uri):
+        self.tile_uri = tile_uri
         # cache stores
         self.label = []
         self.im = []
@@ -28,7 +28,7 @@ class TileDBIterator():
         # pre-fetch
         elif self.curr_idx >= self.last_exclusive_idx:
             # print('fetching:', self.curr_idx)
-            with tiledb.open(constants.tileUri, 'r') as A:
+            with tiledb.open(self.tile_uri, 'r') as A:
                 # find last index to fetch(exclusive)
                 self.last_exclusive_idx = min(self.curr_idx + self.cache_len, self.end_idx)
 
@@ -50,10 +50,3 @@ class TileDBIterator():
         self.curr_idx = self.curr_idx + 1
 
         return self.label[relative_idx], self.im[relative_idx]
-
-
-if __name__ == "__main__":
-    it = TileDBIterator(start=0, end=5, cache_len=2)
-
-    for item in it:
-        print(item)

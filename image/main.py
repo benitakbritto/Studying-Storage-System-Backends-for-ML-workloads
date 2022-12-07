@@ -1,8 +1,11 @@
 import argparse
+from tile_db.TileDBIterableDataset import TileDBIterableDataset
+from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
+from tile_db.helper import get_dataset_count
+import tile_db.dump_fast as tile_db_dump
 from torch.utils.data import DataLoader
 from rocksDB.store import RocksDBStore
-from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
@@ -68,7 +71,7 @@ if args.ds == 'rd':
             dataset,
             batch_size=int(args.batch_size),
             shuffle=False, 
-            num_workers=int(args.num_workers)
+            num_workers=args.num_workers
         )
     # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -type i -pf 256
     elif args.type == 'i':
@@ -76,7 +79,23 @@ if args.ds == 'rd':
         dataloader = DataLoader(dataset=dataset, num_workers=0)
 
 elif args.ds == 'td':
-    raise NotImplementedError("Not implemented")
+    # dump to db
+    root_dir = args.input_file
+    tile_uri = root_dir + "/cifar100.tldb"
+
+    start = time.time()
+    tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
+    end = time.time()
+
+    print(f'{args.ds} Store time = {end - start} s')
+
+    # prepare dataset and dataloader
+    if args.type == 'm':
+        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+    elif args.type == 'i':
+        dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+
+    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 else:
     raise NotImplementedError("Not implemented")
 
