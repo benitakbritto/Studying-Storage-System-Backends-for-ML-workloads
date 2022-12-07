@@ -1,13 +1,16 @@
 import argparse
-from tile_db.TileDBIterableDataset import TileDBIterableDataset
-from tile_db.TileDBMapDataset import TileDBMapDataset
+# from tile_db.TileDBIterableDataset import TileDBIterableDataset
+# from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
-from tile_db.helper import get_dataset_count
-import tile_db.dump_fast as tile_db_dump
+# from tile_db.helper import get_dataset_count
+# import tile_db.dump_fast as tile_db_dump
 from torch.utils.data import DataLoader
 from rocksDB.store import RocksDBStore
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
+from tensor_store.store import TSStore
+from tensor_store.data_loader import TensorStoreDataset
+from tensor_store.TensorStoreIterableDataset import TensorStoreIterableDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -78,24 +81,55 @@ if args.ds == 'rd':
         dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
         dataloader = DataLoader(dataset=dataset, num_workers=0)
 
-elif args.ds == 'td':
-    # dump to db
-    root_dir = args.input_file
-    tile_uri = root_dir + "/cifar100.tldb"
+# elif args.ds == 'td':
+#     # dump to db
+#     root_dir = args.input_file
+#     tile_uri = root_dir + "/cifar100.tldb"
 
+#     start = time.time()
+#     tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
+#     end = time.time()
+
+#     print(f'{args.ds} Store time = {end - start} s')
+
+#     # prepare dataset and dataloader
+#     if args.type == 'm':
+#         dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+#     elif args.type == 'i':
+#         dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+
+#     dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+
+elif args.ds == 'ts':
+    ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
+
+    store = TSStore(args.input_file)
+    # store.cleanup()
+    # Ingest data
     start = time.time()
-    tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
+    store.ingest_data()
     end = time.time()
 
     print(f'{args.ds} Store time = {end - start} s')
 
-    # prepare dataset and dataloader
-    if args.type == 'm':
-        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-    elif args.type == 'i':
-        dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+    # Set Dataloader
+    if args.type == 'i':
+        ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type i -batch-size 1000 -pf 1000
+        dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
+    elif args.type == 'm':
+        ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -batch-size 1000
+        dataset = TensorStoreDataset(store)
+    else:
+        raise NotImplementedError("Not implemented")
+        
+    dataloader = DataLoader(
+        dataset,
+        batch_size = int(args.batch_size), 
+        shuffle=False, 
+        num_workers=0 #Seg-faults on increasing
+    )
 
-    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+
 else:
     raise NotImplementedError("Not implemented")
 

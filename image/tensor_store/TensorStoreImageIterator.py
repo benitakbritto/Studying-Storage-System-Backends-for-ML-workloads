@@ -6,10 +6,13 @@
 '''
 
 import tensorstore as ts
-import constants
+import tensor_store.constants as constants
 
 class TensorStoreImageIterator():
-    def __init__(self, cache_len, start, end):
+    
+    def __init__(self, db, cache_len, start, end):
+        
+        self.db = db
         # cache stores
         self.image = []
 
@@ -22,21 +25,6 @@ class TensorStoreImageIterator():
         # import pdb; pdb.set_trace()
         self.cache_len = min(cache_len, end - start + 1)
 
-        self.dataset = ts.open({
-            'driver': 'n5',
-            'kvstore': {
-                'driver': 'file',
-                'path': constants.PATH_TO_KV_STORE ,
-            },
-            'metadata': {
-                'compression': {
-                    'type': 'raw'
-                },
-                'dataType': 'float32',
-                'dimensions': [constants.INPUT_SIZE, constants.IMAGE_SIZE + constants.LABEL_SIZE],
-                'blockSize': [1024, 3073],
-            },
-        }).result()
 
     def __iter__(self):
         return self
@@ -48,14 +36,13 @@ class TensorStoreImageIterator():
 
         # pre-fetch
         elif self.curr_idx >= self.last_exclusive_idx:
-            # import pdb; pdb.set_trace()
             # print('fetching:', self.curr_idx)
             
             # find last index to fetch(exclusive)
             self.last_exclusive_idx = min(self.curr_idx + self.cache_len, self.end_idx)
 
             # bulk fetch
-            data = self.dataset[self.curr_idx : self.last_exclusive_idx, : ].read().result()
+            data = self.db[self.curr_idx : self.last_exclusive_idx, : ].read().result()
             # cache store
             self.image = data
                 

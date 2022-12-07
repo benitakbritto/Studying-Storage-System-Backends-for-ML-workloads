@@ -5,10 +5,10 @@
     @authors: Benita, Hemal, Reetuparna
 '''
 
-import tensor.constants as constants
+import tensor_store.constants as constants
 import json
 from torch.utils.data import Dataset
-from tensor.helper import int_to_bytes
+from tensor_store.helper import int_to_bytes
 
 class TensorStoreDataset(Dataset):
     

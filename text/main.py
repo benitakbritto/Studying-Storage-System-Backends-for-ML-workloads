@@ -9,8 +9,8 @@ import tile_db.dump as tile_db_dump
 from rocksDB.store import RocksDBStore
 from pathlib import Path
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
-from tensor.store import TSStore
-from tensor.TensorStoreDataset import TensorStoreDataset
+from tensor_store.store import TSStore
+from tensor_store.TensorStoreDataset import TensorStoreDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 
 # Initialize parser
@@ -112,8 +112,7 @@ def run_test():
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 
         elif args.ds == 'ts':
-            start = time.time()
-
+            ## Example: python main.py -ds ts -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type m -batch-size 10000 -num-workers 8
             store = TSStore(args.input_file)
             # store.cleanup()
             # Ingest data
@@ -134,8 +133,8 @@ def run_test():
                 dataloader = DataLoader(
                     dataset,
                     batch_size = int(args.batch_size), 
-                    shuffle=False, 
-                    num_workers=args.num_workers
+                    shuffle=False,
+                    num_workers=int(args.num_workers)
                 )
             elif args.type == 'i':
                 raise NotImplementedError("Not implemented")
@@ -156,8 +155,3 @@ def run_test():
 
 if __name__ == "__main__":
     run_test()
-
-
-
-
-
