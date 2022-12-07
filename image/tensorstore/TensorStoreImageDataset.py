@@ -3,6 +3,7 @@ import time
 import math
 from TensorStoreImageIterator import TensorStoreImageIterator
 import constants
+from db_util import Store
 
 class TensorStoreImageDataset(IterableDataset):
 
@@ -29,6 +30,10 @@ class TensorStoreImageDataset(IterableDataset):
 
 if __name__ == "__main__":
     # should give same set of data as range(3, 7), i.e., [3, 4, 5, 6].
+    # store = Store()
+    # store.dump_to_db()
+
+    print("Done")
     ds = TensorStoreImageDataset(start=0, end=constants.INPUT_SIZE, cache_len=constants.INPUT_SIZE)
     
     start = time.time()
