@@ -138,7 +138,6 @@ def run_test():
                 num_workers=int(args.num_workers))
 
         elif args.ds == 'ts':
-            ## Example: python main.py -ds ts -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type m -batch-size 10000 -num-workers 8
             store = TSStore(args.input_file)
             # store.cleanup()
             # Ingest data

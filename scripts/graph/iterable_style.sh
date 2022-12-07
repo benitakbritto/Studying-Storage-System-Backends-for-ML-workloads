@@ -3,10 +3,10 @@ BLUE='\033[0;44m'
 NOCOLOR='\033[0m'
 
 # Constants
-INPUTFILE=/mnt/data/dataset/twitter/twitter_sentiment_dataset.csv
+INPUTFILE=/mnt/data/dataset/fb15k-237/train.txt
 INPUTFILESIZE=1
 TYPE=i
-WORKLOAD=text
+WORKLOAD=graph
 ITR=1
 
 # RocksDB

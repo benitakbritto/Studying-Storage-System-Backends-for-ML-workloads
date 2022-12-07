@@ -81,7 +81,6 @@ def run_test():
             store.cleanup()
 
             # Set Dataloader
-            # Example: python main.py -ds rd -input-file /mnt/data/dataset/fb15k-237/train.txt -input-rows-per-key 256 -type m -batch-size 256 
             if args.type == 'm':
                 dataset = RocksDBMapStyleDataset()
                 dataloader = DataLoader(
@@ -90,7 +89,7 @@ def run_test():
                     shuffle=False, 
                     num_workers=int(args.num_workers)
                 )
-            # Example: python main.py -ds rd -input-file /mnt/data/dataset/fb15k-237/train.txt -type i -pf 256
+
             elif args.type == 'i':
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, 
@@ -123,9 +122,7 @@ def run_test():
 
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
-        elif args.ds == 'ts':
-            ### Example: python main.py -ds ts -input-file /mnt/data/dataset/fb15k-237/train.txt  -type m -batch-size 256 -num-workers 8
-            
+        elif args.ds == 'ts':            
             store = TSStore(args.input_file)
             
             # Ingest data

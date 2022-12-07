@@ -82,7 +82,6 @@ def run_test():
             store.cleanup()
 
             # Set Dataloader
-            # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256 
             if args.type == 'm':
                 dataset = RocksDBMapStyleDataset()
                 dataloader = DataLoader(
@@ -91,7 +90,6 @@ def run_test():
                     shuffle=False, 
                     num_workers=args.num_workers
                 )
-            # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -type i -pf 256
             elif args.type == 'i':
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, 
@@ -122,8 +120,6 @@ def run_test():
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
         elif args.ds == 'ts':
-            ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
-
             store = TSStore(args.input_file)
             # store.cleanup()
             # Ingest data
@@ -135,10 +131,8 @@ def run_test():
 
             # Set Dataloader
             if args.type == 'i':
-                ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type i -batch-size 1000 -pf 1000
                 dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
             elif args.type == 'm':
-                ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -batch-size 1000
                 dataset = TensorStoreDataset(store)
             else:
                 raise NotImplementedError("Not implemented")
