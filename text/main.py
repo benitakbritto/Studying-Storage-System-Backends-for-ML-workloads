@@ -44,111 +44,118 @@ parser.add_argument("-batch-size",
     help="Batch size for the dataloader",
     default=256,
     required=False)
+parser.add_argument("-itr",
+    help="Number of iterations to run test",
+    default=5,
+    required=False)
 
 # Read arguments from command line
 args = parser.parse_args()
 
-dataset = None
-dataloader = None
+def run_test():
+    for i in range(args.itr):
+        print(f'Iteration {i + 1}')
 
-start = None
-end = None
+        dataset = None
+        dataloader = None
+        start = None
+        end = None
 
-if args.ds == 'rd':
-    # Store data in rocks db
-    start = time.time()
+        if args.ds == 'rd':
+            # Store data in rocks db
+            start = time.time()
 
-    store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
-    store.store_data()
-    store.store_metadata()
-    
-    end = time.time()
+            store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
+            store.store_data()
+            store.store_metadata()
+            
+            end = time.time()
 
-    total_rows = store.get_total_input_rows()
-    store.cleanup()
+            total_rows = store.get_total_input_rows()
+            store.cleanup()
 
-    # Set Dataloader
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
-    if args.type == 'm':
-        dataset = RocksDBMapStyleDataset()
-        dataloader = DataLoader(
-            dataset,
-            batch_size=int(args.batch_size),
-            shuffle=False, 
-            num_workers=int(args.num_workers)
-        )
-    # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
-    elif args.type == 'i':
-        dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-        dataloader = DataLoader(dataset=dataset, num_workers=0)
+            # Set Dataloader
+            # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
+            if args.type == 'm':
+                dataset = RocksDBMapStyleDataset()
+                dataloader = DataLoader(
+                    dataset,
+                    batch_size=int(args.batch_size),
+                    shuffle=False, 
+                    num_workers=int(args.num_workers)
+                )
+            # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
+            elif args.type == 'i':
+                dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+                dataloader = DataLoader(dataset=dataset, num_workers=0)
 
-elif args.ds == 'td':
-    dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
-    dataloader = DataLoader(dataset=dataset)
+        elif args.ds == 'td':
+            dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
+            dataloader = DataLoader(dataset=dataset)
 
-    # dump to db
-    root_dir = str(Path(args.input_file).parent)
+            # dump to db
+            root_dir = str(Path(args.input_file).parent)
 
-    # switch to input file name from args
-    dataset_uri = args.input_file
-    tile_uri = root_dir + "twitter.tldb"
+            # switch to input file name from args
+            dataset_uri = args.input_file
+            tile_uri = root_dir + "twitter.tldb"
 
-    start = time.time()
-    tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+            start = time.time()
+            tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
 
-    # prepare dataset and dataloader
-    if args.type == 'm':
-        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-    elif args.type == 'i':
-        dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+            # prepare dataset and dataloader
+            if args.type == 'm':
+                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+            elif args.type == 'i':
+                dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
 
-    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+            dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 
-elif args.ds == 'ts':
-    start = time.time()
+        elif args.ds == 'ts':
+            start = time.time()
 
-    store = TSStore(args.input_file)
-    # store.cleanup()
-    # Ingest data
-    loop = asyncio.get_event_loop()
-    start = time.time()
-    task = [loop.create_task(store.ingestData())]
+            store = TSStore(args.input_file)
+            # store.cleanup()
+            # Ingest data
+            loop = asyncio.get_event_loop()
+            start = time.time()
+            task = [loop.create_task(store.ingestData())]
 
-    loop.run_until_complete(asyncio.wait(task)) 
-    loop.close()
+            loop.run_until_complete(asyncio.wait(task)) 
+            loop.close()
 
-    end = time.time()
+            end = time.time()
 
-    print(f'{args.ds} Store time = {end - start} s')
+            print(f'{args.ds} Store time = {end - start} s')
 
-    # Set Dataloader
-    if args.type == 'm':
-        dataset = TensorStoreDataset(store)
-        dataloader = DataLoader(
-            dataset,
-            batch_size = int(args.batch_size), 
-            shuffle=False, 
-            num_workers=args.num_workers
-        )
-    elif args.type == 'i':
-        raise NotImplementedError("Not implemented")
+            # Set Dataloader
+            if args.type == 'm':
+                dataset = TensorStoreDataset(store)
+                dataloader = DataLoader(
+                    dataset,
+                    batch_size = int(args.batch_size), 
+                    shuffle=False, 
+                    num_workers=args.num_workers
+                )
+            elif args.type == 'i':
+                raise NotImplementedError("Not implemented")
 
-   
-else:
-    raise NotImplementedError("Not implemented")
+        else:
+            raise NotImplementedError("Not implemented")
 
+        print(f'{args.ds} Write = {end - start} s')
 
-print(f'{args.ds} Write = {end - start} s')
+        # Call dataloader
+        start = time.time()
 
-# Call dataloader
-start = time.time()
+        for batch_idx, data in enumerate(dataloader):
+            i = batch_idx
 
-for batch_idx, data in enumerate(dataloader):
-    i = batch_idx
+        end = time.time()
+        print(f'{args.ds} Dataloader time = {end - start} s')
 
-end = time.time()
-print(f'{args.ds} Dataloader time = {end - start} s')
-
+if __name__ == "__main__":
+    run_test()
 
 
 
