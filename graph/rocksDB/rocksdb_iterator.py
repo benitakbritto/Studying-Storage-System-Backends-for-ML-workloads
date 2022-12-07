@@ -1,3 +1,10 @@
+'''
+    @brief: Iterates over storage backend data
+    @prereq: bash
+    @usage: from iterable_style_data_loader
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 from rocksdict import Rdict
 import rocksDB.constants
 import rocksDB.helper as bytes
@@ -19,7 +26,6 @@ class RocksDBIterator():
         self.last_exclusive_idx = start - 1
         
         # items to fetch in one shot, don't overfetch
-        # import pdb; pdb.set_trace()
         self.cache_len = min(cache_len, end - start + 1)
 
     def __iter__(self):

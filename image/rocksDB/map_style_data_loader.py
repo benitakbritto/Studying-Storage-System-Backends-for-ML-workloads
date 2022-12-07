@@ -1,7 +1,7 @@
 '''
-    @brief: TODO: Add better desc
+    @brief: Map style Data loader
     @prereq: bash
-    @usage: python <filename>
+    @usage: from main.py
     @authors: Benita, Hemal, Reetuparna
 '''
 

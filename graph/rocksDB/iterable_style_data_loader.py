@@ -1,13 +1,15 @@
+'''
+    @brief: Iterable style Data loader
+    @prereq: bash
+    @usage: from main.py
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 import math
 from time import sleep
 from rocksDB.rocksdb_iterator import RocksDBIterator
 from torch.utils.data import IterableDataset, DataLoader, get_worker_info
 
-'''
-Usage:  
-ds = RocksDBIterableDataset(start=0, end=1000, cache_len=100)
-dl = DataLoader(ds, num_workers=0)
-'''
 class RocksDBIterableDataset(IterableDataset):
     def __init__(self, start, end, cache_len):
         # assert end > start, "this example code only works with end > start"

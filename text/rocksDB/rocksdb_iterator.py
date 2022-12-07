@@ -1,6 +1,7 @@
 '''
-    @brief: TODO: Add better desc
-    @usage: -
+    @brief: Iterates over storage backend data
+    @prereq: bash
+    @usage: from iterable_style_data_loader
     @authors: Benita, Hemal, Reetuparna
 '''
 
@@ -38,7 +39,6 @@ class RocksDBIterator():
 
         # pre-fetch
         elif self.curr_idx >= self.last_exclusive_idx:
-            # print('fetching:', self.curr_idx)
             # find last index to fetch(exclusive)
             self.last_exclusive_idx = min(self.curr_idx + self.cache_len, self.end_idx)
 

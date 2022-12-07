@@ -1,5 +1,5 @@
 '''
-    @brief: TODO: Add better desc
+    @brief: Data format for twitter dataset
     @prereq: bash
     @usage: 
     @authors: Benita, Hemal, Reetuparna

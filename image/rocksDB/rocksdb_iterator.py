@@ -1,3 +1,10 @@
+'''
+    @brief: Iterates over storage backend data
+    @prereq: bash
+    @usage: from iterable_style_data_loader
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 from rocksdict import Rdict
 import rocksDB.constants
 import rocksDB.helper as bytes

@@ -1,5 +1,6 @@
 '''
-    @brief: Read data from filesystem and store in storage backend
+    @brief: Storing single value or multiple values per key by reading data 
+        from the filesystem and storing it in storage backends
     @prereq: bash
     @usage: from main.py
     @authors: Benita, Hemal, Reetuparna
