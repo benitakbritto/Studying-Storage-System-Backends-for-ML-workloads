@@ -36,16 +36,16 @@ class TSStore:
                 row_index += 1  
         self.len = row_index
     
-if __name__ == '__main__':
-    store = TSStore('/mnt/data/dataset/twitter/twitter_sentiment_dataset.csv')
+# if __name__ == '__main__':
+#     store = TSStore('/mnt/data/dataset/twitter/twitter_sentiment_dataset.csv')
 
-    loop = asyncio.get_event_loop()
-    start = time.time()
-    task = [loop.create_task(store.ingestData())]
+#     loop = asyncio.get_event_loop()
+#     start = time.time()
+#     task = [loop.create_task(store.ingestData())]
 
-    loop.run_until_complete(asyncio.wait(task)) 
-    loop.close()
+#     loop.run_until_complete(asyncio.wait(task)) 
+#     loop.close()
 
-    end = time.time()
+#     end = time.time()
 
-    print(f'Store time = {end - start} s')
+#     print(f'Store time = {end - start} s')

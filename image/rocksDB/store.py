@@ -87,15 +87,15 @@ class RocksDBStore:
     def cleanup(self):
         self.db.close()
 
-if __name__ == "__main__":
-    store_obj = RocksDBStore()
+# if __name__ == "__main__":
+#     store_obj = RocksDBStore()
 
-    start = time.time()
+#     start = time.time()
     
-    store_obj.store_data()
-    store_obj.store_metadata()
+#     store_obj.store_data()
+#     store_obj.store_metadata()
     
-    end = time.time()
-    print(f'Elapsed time = {end - start}')
+#     end = time.time()
+#     print(f'Elapsed time = {end - start}')
 
-    store_obj.cleanup()
+#     store_obj.cleanup()

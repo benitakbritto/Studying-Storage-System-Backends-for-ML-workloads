@@ -46,14 +46,23 @@ parser.add_argument("-batch-size",
     required=False)
 parser.add_argument("-itr",
     help="Number of iterations to run test",
-    default=5,
+    default=1,
     required=False)
 
 # Read arguments from command line
 args = parser.parse_args()
 
 def run_test():
-    for i in range(args.itr):
+    print(f'ds = {args.ds} | \
+        pf = {args.pf} | \
+        input-file = {args.input_file} | \
+        input-rows-per-key = {args.input_rows_per_key} | \
+        type = {args.type} | \
+        num-workers = {args.num_workers} | \
+        batch-size = {args.batch_size} | \
+        itr = {args.itr}')
+
+    for i in range(int(args.itr)):
         print(f'Iteration {i + 1}')
 
         dataset = None
@@ -86,11 +95,15 @@ def run_test():
                 )
             # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
             elif args.type == 'i':
-                dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+                dataset = RocksDBIterableDataset(cache_len=int(args.pf), 
+                    start=0, 
+                    end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, num_workers=0)
 
         elif args.ds == 'td':
-            dataset = TileDBIterableDataset(cache_len=args.pf, start=0, end=get_dataset_count())
+            dataset = TileDBIterableDataset(cache_len=args.pf, 
+                start=0, 
+                end=get_dataset_count())
             dataloader = DataLoader(dataset=dataset)
 
             # dump to db
@@ -104,12 +117,18 @@ def run_test():
             tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
 
             # prepare dataset and dataloader
-            if args.type == 'm':
-                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-            elif args.type == 'i':
-                dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+            if args.type == 'i':
+                dataset = TileDBIterableDataset(cache_len=int(args.pf), 
+                    start=0, 
+                    end=get_dataset_count(tile_uri=tile_uri), 
+                    tile_uri=tile_uri)
+            elif args.type == 'm':
+                dataset = TileDBMapDataset(size=get_dataset_count(), 
+                    tile_uri=tile_uri)
 
-            dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+            dataloader = DataLoader(dataset=dataset, 
+                batch_size=int(args.batch_size, 
+                num_workers=int(args.num_workers)))
 
         elif args.ds == 'ts':
             ## Example: python main.py -ds ts -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type m -batch-size 10000 -num-workers 8

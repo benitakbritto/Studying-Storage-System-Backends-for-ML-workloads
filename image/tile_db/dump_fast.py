@@ -24,13 +24,13 @@ def create_tiledb_schema(rows_count, tile_uri, np_tuple_type):
 
     tiledb.DenseArray.create(tile_uri, schema, overwrite=True)
 
-    print('TileDB schema created')
+    # print('TileDB schema created')
 
 def write_to_tldb(row_start, row_end, im_data, label_data, tile_uri):
     with tiledb.DenseArray(tile_uri, mode='w') as A:
         A[row_start:row_end] = {'im': im_data, 'label': label_data}
     
-    print(f'from:{row_start} to {row_end} is written')
+    # print(f'from:{row_start} to {row_end} is written')
     
 
 def dump_to_db(root_dir, tile_uri):
@@ -71,7 +71,7 @@ def dump_to_db(root_dir, tile_uri):
 
             label_data = labels.numpy(force=False)
 
-            print(f'batch_idx:{batch_idx} is converted')
+            # print(f'batch_idx:{batch_idx} is converted')
 
             task = executor.submit(write_to_tldb, *(i, i + size, im_data, label_data, tile_uri))
 
@@ -80,4 +80,4 @@ def dump_to_db(root_dir, tile_uri):
             # next
             i += size
 
-    print("Task results: ", [t.result() for t in tasks])
+    # print("Task results: ", [t.result() for t in tasks])

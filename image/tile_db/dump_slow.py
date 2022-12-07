@@ -26,13 +26,13 @@ def create_tiledb_schema(rows_count, cols_count):
 
     tiledb.DenseArray.create(constants.tileUri, schema, overwrite=True)
 
-    print('TileDB schema created')
+    # print('TileDB schema created')
 
 def write_to_tldb(row_start, row_end, col_start, col_end, data):
     with tiledb.DenseArray(constants.tileUri, mode='w') as A:
         A[row_start:row_end, col_start:col_end] = data
     
-    print(f'from:{row_start} to {row_end} is written')
+    # print(f'from:{row_start} to {row_end} is written')
     
 
 def dump_to_db():
@@ -67,7 +67,7 @@ def dump_to_db():
 
             im_with_labels = torch.cat((images, labels), -1)
 
-            print(f'batch_idx:{batch_idx} is converted')
+            # print(f'batch_idx:{batch_idx} is converted')
             data = im_with_labels.numpy(force=False)
             
             task = executor.submit(write_to_tldb, *(i, i + size, 0, image_len, data))
@@ -77,7 +77,7 @@ def dump_to_db():
             # next
             i += size
 
-    print("Task results: ", [t.result() for t in tasks])
+    # print("Task results: ", [t.result() for t in tasks])
 
 if __name__ == "__main__":
     dump_to_db()
