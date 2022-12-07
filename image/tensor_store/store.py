@@ -35,6 +35,8 @@ class TSStore():
             'delete_existing': True,
         }).result()
 
+        self.size = 0
+
     def dump_to_db(self):
         data_train = DataLoader(
                 self.input_data,
@@ -52,5 +54,7 @@ class TSStore():
             imlabels = torch.cat((images, labels), -1)
             self.dataset[i:i+size, :].write(imlabels).result()
             i+=size
+        
+        self.size = i
 
         print("Loaded")

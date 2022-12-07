@@ -111,10 +111,10 @@ elif args.ds == 'ts':
     end = time.time()
 
     print(f'{args.ds} Store time = {end - start} s')
-
+    print(store.size)
     # Set Dataloader
     if args.type == 'i':
-        dataset = TensorStoreIterableDataset(store=store, start=0, end=50000, cache_len=int(args.pf))
+        dataset = TensorStoreIterableDataset(store=store, start=0, end=store.size, cache_len=int(args.pf))
     elif args.type == 'm':
         dataset = TensorStoreDataset(store)
     else:
