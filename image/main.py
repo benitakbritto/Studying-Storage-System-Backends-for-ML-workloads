@@ -111,11 +111,13 @@ elif args.ds == 'ts':
     end = time.time()
 
     print(f'{args.ds} Store time = {end - start} s')
-   
+
     # Set Dataloader
     if args.type == 'i':
+        ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type i -batch-size 1000 -pf 1000
         dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
     elif args.type == 'm':
+        ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -batch-size 1000
         dataset = TensorStoreDataset(store)
     else:
         raise NotImplementedError("Not implemented")
@@ -124,7 +126,7 @@ elif args.ds == 'ts':
         dataset,
         batch_size = int(args.batch_size), 
         shuffle=False, 
-        num_workers=0
+        num_workers=0 #Seg-faults on increasing
     )
 
 
