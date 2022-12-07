@@ -87,7 +87,6 @@ def run_test():
             store.cleanup()
 
             # Set Dataloader
-            # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -input-rows-per-key 256 -type m -batch-size 256 
             if args.type == 'm':
                 dataset = RocksDBMapStyleDataset()
                 dataloader = DataLoader(
@@ -96,7 +95,6 @@ def run_test():
                     shuffle=False, 
                     num_workers=int(args.num_workers)
                 )
-            # Example: python main.py -ds rd -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i -pf 256
             elif args.type == 'i':
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), 
                     start=0, 
