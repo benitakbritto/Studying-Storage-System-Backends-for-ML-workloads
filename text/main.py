@@ -1,5 +1,7 @@
 import argparse
 import asyncio
+import os
+import shutil
 from tile_db.TileDBIterableDataset import TileDBIterableDataset
 from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
@@ -112,6 +114,10 @@ def run_test():
             # switch to input file name from args
             dataset_uri = args.input_file
             tile_uri = root_dir + "twitter.tldb"
+
+            # destroy path
+            if os.path.exists(tile_uri):
+                shutil.rmtree(tile_uri)
 
             start = time.time()
             tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)

@@ -1,9 +1,9 @@
 import argparse
-# from tile_db.TileDBIterableDataset import TileDBIterableDataset
-# from tile_db.TileDBMapDataset import TileDBMapDataset
-import time
-# from tile_db.helper import get_dataset_count
-# import tile_db.dump_fast as tile_db_dump
+from tile_db.TileDBIterableDataset import TileDBIterableDataset
+from tile_db.TileDBMapDataset import TileDBMapDataset
+import time, os, shutil
+from tile_db.helper import get_dataset_count
+import tile_db.dump_fast as tile_db_dump
 from torch.utils.data import DataLoader
 from rocksDB.store import RocksDBStore
 from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
@@ -81,24 +81,28 @@ if args.ds == 'rd':
         dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
         dataloader = DataLoader(dataset=dataset, num_workers=0)
 
-# elif args.ds == 'td':
-#     # dump to db
-#     root_dir = args.input_file
-#     tile_uri = root_dir + "/cifar100.tldb"
+elif args.ds == 'td':
+    # dump to db
+    root_dir = args.input_file
+    tile_uri = root_dir + "/cifar100.tldb"
 
-#     start = time.time()
-#     tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
-#     end = time.time()
+    # destroy path
+    if os.path.exists(tile_uri):
+        shutil.rmtree(tile_uri)
 
-#     print(f'{args.ds} Store time = {end - start} s')
+    start = time.time()
+    tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
+    end = time.time()
 
-#     # prepare dataset and dataloader
-#     if args.type == 'm':
-#         dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-#     elif args.type == 'i':
-#         dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+    print(f'{args.ds} Store time = {end - start} s')
 
-#     dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
+    # prepare dataset and dataloader
+    if args.type == 'i':
+        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+    elif args.type == 'm':
+        dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+
+    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
 elif args.ds == 'ts':
     ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
