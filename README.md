@@ -86,3 +86,7 @@ TODO
 
 #### Embedding
 TODO
+
+### All tests
+To run all input tests, `scripts/run_input.sh`  
+To run all intermediate tests, `scripts/run_intermediate.sh` 
