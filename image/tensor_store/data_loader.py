@@ -11,14 +11,14 @@ from torch.utils.data import Dataset
 class TensorStoreDataset(Dataset):
     
     def __init__(self, store):
-        self.dataset = store.dataset
+        self.db = store.db
 
     def __getitem__(self, index):
-        data = self.dataset[index : index+1, : ].read().result()
+        data = self.db[index : index+1, : ].read().result()
         return data
     
     def __len__(self):
-        return self.dataset.shape[0]
+        return self.db.shape[0]
 
 # if __name__=='__main__':
 #     ds = TensorStoreDataset()
