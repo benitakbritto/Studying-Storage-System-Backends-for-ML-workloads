@@ -1,4 +1,3 @@
-DATASET_PATH = '/mnt/data/dataset/fb15k-237/train.txt'
 DB_PATH = './db_path'
 NUM_ROWS_PER_KEY = 'NUM_OF_ROWS_PER_KEY'
 NUM_KEYS = 'NUM_OF_KEYS'
