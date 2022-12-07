@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 from tile_db.TileDBIterableDataset import TileDBIterableDataset
 from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
@@ -125,7 +126,7 @@ elif args.ds == 'ts':
         dataset = TensorStoreDataset(store)
         dataloader = DataLoader(
             dataset,
-            batch_size = int(args.input_rows_per_key), 
+            batch_size = int(args.batch_size), 
             shuffle=False, 
             num_workers=args.num_workers
         )
