@@ -101,7 +101,7 @@ if args.ds == 'rd':
 #     dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 
 elif args.ds == 'ts':
-    start = time.time()
+    ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
 
     store = TSStore(args.input_file)
     # store.cleanup()
@@ -116,7 +116,6 @@ elif args.ds == 'ts':
     if args.type == 'i':
         dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
     elif args.type == 'm':
-        # python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
         dataset = TensorStoreDataset(store)
     else:
         raise NotImplementedError("Not implemented")
