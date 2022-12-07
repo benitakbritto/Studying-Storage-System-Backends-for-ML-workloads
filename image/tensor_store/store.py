@@ -37,7 +37,7 @@ class TSStore():
 
         self.size = 0
 
-    def dump_to_db(self):
+    def ingest_data(self):
         data_train = DataLoader(
                 self.input_data,
                 batch_size = constants.BATCH_SIZE,

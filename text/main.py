@@ -105,7 +105,6 @@ elif args.ds == 'td':
     dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 
 elif args.ds == 'ts':
-    start = time.time()
 
     store = TSStore(args.input_file)
     # store.cleanup()

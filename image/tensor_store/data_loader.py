@@ -11,7 +11,6 @@ from torch.utils.data import Dataset
 class TensorStoreDataset(Dataset):
     
     def __init__(self, store):
-        print(store.dataset.shape[0])
         self.dataset = store.dataset
 
     def __getitem__(self, index):
