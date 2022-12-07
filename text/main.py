@@ -14,6 +14,7 @@ from rocksDB.map_style_data_loader import RocksDBMapStyleDataset
 from tensor_store.store import TSStore
 from tensor_store.TensorStoreDataset import TensorStoreDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
+import rocksDB.db_util
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -180,3 +181,7 @@ def run_test():
 
 if __name__ == "__main__":
     run_test()
+
+    # cleanup
+    if args.ds == 'rd':
+        rocksDB.db_util.delete_db()

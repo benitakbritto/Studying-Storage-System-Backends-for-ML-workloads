@@ -11,6 +11,8 @@ from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 from tensor_store.store import TSStore
 from tensor_store.data_loader import TensorStoreDataset
 from tensor_store.TensorStoreIterableDataset import TensorStoreIterableDataset
+import rocksDB.db_util
+
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -47,104 +49,124 @@ parser.add_argument("-batch-size",
 # Read arguments from command line
 args = parser.parse_args()
 
-dataset = None
-dataloader = None
 
-start = None
-end = None
-
-if args.ds == 'rd':
-    # Store data in rocks db
-    start = time.time()
-
-    store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
-    store.store_data()
-    store.store_metadata()
+def run_test():
+    print(f'ds = {args.ds} | \
+        pf = {args.pf} | \
+        input-file = {args.input_file} | \
+        input-rows-per-key = {args.input_rows_per_key} | \
+        type = {args.type} | \
+        num-workers = {args.num_workers} | \
+        batch-size = {args.batch_size} | \
+        itr = {args.itr}')
     
-    end = time.time()
+    for i in range(int(args.itr)):
+        print(f'Iteration {i + 1}')
 
-    total_rows = store.get_total_input_rows()
-    store.cleanup()
+        dataset = None
+        dataloader = None
+        start = None
+        end = None
 
-    # Set Dataloader
-    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256 
-    if args.type == 'm':
-        dataset = RocksDBMapStyleDataset()
-        dataloader = DataLoader(
-            dataset,
-            batch_size=int(args.batch_size),
-            shuffle=False, 
-            num_workers=args.num_workers
-        )
-    # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -type i -pf 256
-    elif args.type == 'i':
-        dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
-        dataloader = DataLoader(dataset=dataset, num_workers=0)
+        if args.ds == 'rd':
+            # Store data in rocks db
+            start = time.time()
 
-elif args.ds == 'td':
-    # dump to db
-    root_dir = args.input_file
-    tile_uri = root_dir + "/cifar100.tldb"
+            store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
+            store.store_data()
+            store.store_metadata()
+            
+            end = time.time()
 
-    # destroy path
-    if os.path.exists(tile_uri):
-        shutil.rmtree(tile_uri)
+            total_rows = store.get_total_input_rows()
+            store.cleanup()
 
-    start = time.time()
-    tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
-    end = time.time()
+            # Set Dataloader
+            # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -input-rows-per-key 256 -type m -batch-size 256 
+            if args.type == 'm':
+                dataset = RocksDBMapStyleDataset()
+                dataloader = DataLoader(
+                    dataset,
+                    batch_size=int(args.batch_size),
+                    shuffle=False, 
+                    num_workers=args.num_workers
+                )
+            # Example: python main.py -ds rd -input-file ../../../../../mnt/data/dataset/cifar/ -type i -pf 256
+            elif args.type == 'i':
+                dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
+                dataloader = DataLoader(dataset=dataset, num_workers=0)
 
-    print(f'{args.ds} Store time = {end - start} s')
+        elif args.ds == 'td':
+            # dump to db
+            root_dir = args.input_file
+            tile_uri = root_dir + "/cifar100.tldb"
 
-    # prepare dataset and dataloader
-    if args.type == 'i':
-        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
-    elif args.type == 'm':
-        dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+            # destroy path
+            if os.path.exists(tile_uri):
+                shutil.rmtree(tile_uri)
 
-    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
+            start = time.time()
+            tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
+            end = time.time()
 
-elif args.ds == 'ts':
-    ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
+            print(f'{args.ds} Store time = {end - start} s')
 
-    store = TSStore(args.input_file)
-    # store.cleanup()
-    # Ingest data
-    start = time.time()
-    store.ingest_data()
-    end = time.time()
+            # prepare dataset and dataloader
+            if args.type == 'i':
+                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+            elif args.type == 'm':
+                dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
 
-    print(f'{args.ds} Store time = {end - start} s')
+            dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
-    # Set Dataloader
-    if args.type == 'i':
-        ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type i -batch-size 1000 -pf 1000
-        dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
-    elif args.type == 'm':
-        ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -batch-size 1000
-        dataset = TensorStoreDataset(store)
-    else:
-        raise NotImplementedError("Not implemented")
-        
-    dataloader = DataLoader(
-        dataset,
-        batch_size = int(args.batch_size), 
-        shuffle=False, 
-        num_workers=0 #Seg-faults on increasing
-    )
+        elif args.ds == 'ts':
+            ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
+
+            store = TSStore(args.input_file)
+            # store.cleanup()
+            # Ingest data
+            start = time.time()
+            store.ingest_data()
+            end = time.time()
+
+            print(f'{args.ds} Store time = {end - start} s')
+
+            # Set Dataloader
+            if args.type == 'i':
+                ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type i -batch-size 1000 -pf 1000
+                dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
+            elif args.type == 'm':
+                ## Example; python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -batch-size 1000
+                dataset = TensorStoreDataset(store)
+            else:
+                raise NotImplementedError("Not implemented")
+                
+            dataloader = DataLoader(
+                dataset,
+                batch_size = int(args.batch_size), 
+                shuffle=False, 
+                num_workers=0 #Seg-faults on increasing
+            )
+
+        else:
+            raise NotImplementedError("Not implemented")
 
 
-else:
-    raise NotImplementedError("Not implemented")
+        print(f'{args.ds} Write = {end - start} s')
+
+        # Call dataloader
+        start = time.time()
+
+        for batch_idx, data in enumerate(dataloader):
+            i = batch_idx
+
+        end = time.time()
+        print(f'{args.ds} Dataloader time = {end - start} s')
 
 
-print(f'{args.ds} Write = {end - start} s')
+if __name__ == "__main__":
+    run_test()
 
-# Call dataloader
-start = time.time()
-
-for batch_idx, data in enumerate(dataloader):
-    i = batch_idx
-
-end = time.time()
-print(f'{args.ds} Dataloader time = {end - start} s')
+    # cleanup
+    if args.ds == 'rd':
+        rocksDB.db_util.delete_db()
