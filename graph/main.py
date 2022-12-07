@@ -1,6 +1,11 @@
 import argparse
+from pathlib import Path
+from tile_db.TileDBIterableDataset import TileDBIterableDataset
+from tile_db.TileDBMapDataset import TileDBMapDataset
 import time
 from torch.utils.data import DataLoader
+import tile_db.dump_fast as tile_db_dump
+from tile_db.helper import get_dataset_count
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -46,7 +51,26 @@ end = None
 if args.ds == 'rd':
     raise NotImplementedError("Not implemented")
 elif args.ds == 'td':
-    raise NotImplementedError("Not implemented")
+    # dump to db
+    root_dir = str(Path(args.input_file).parent)
+
+    # switch to input file name from args
+    dataset_uri = args.input_file
+    tile_uri = root_dir + "fb15k-237.tldb"
+
+    start = time.time()
+    tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+    end = time.time()
+
+    print(f'{args.ds} Store time = {end - start} s')
+
+    # prepare dataset and dataloader
+    if args.type == 'm':
+        dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+    elif args.type == 'i':
+        dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+
+    dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size))
 else:
     raise NotImplementedError("Not implemented")
 
