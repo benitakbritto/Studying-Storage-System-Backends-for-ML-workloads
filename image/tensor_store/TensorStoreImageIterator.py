@@ -10,10 +10,9 @@ import tensor_store.constants as constants
 
 class TensorStoreImageIterator():
     
-    def __init__(self, store, cache_len, start, end):
+    def __init__(self, db, cache_len, start, end):
         
-        self.dataset = store.dataset
-        print(store.dataset.shape)
+        self.db = db
         # cache stores
         self.image = []
 
@@ -43,7 +42,7 @@ class TensorStoreImageIterator():
             self.last_exclusive_idx = min(self.curr_idx + self.cache_len, self.end_idx)
 
             # bulk fetch
-            data = self.dataset[self.curr_idx : self.last_exclusive_idx, : ].read().result()
+            data = self.db[self.curr_idx : self.last_exclusive_idx, : ].read().result()
             # cache store
             self.image = data
                 

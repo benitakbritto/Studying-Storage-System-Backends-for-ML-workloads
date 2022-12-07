@@ -114,7 +114,7 @@ elif args.ds == 'ts':
    
     # Set Dataloader
     if args.type == 'i':
-        dataset = TensorStoreIterableDataset(store=store, start=0, end=store.size, cache_len=int(args.pf))
+        dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
     elif args.type == 'm':
         # python main.py -ds ts -input-file ../../../../../mnt/data/dataset/cifar/ -type m -pf 1000 -batch-size 1000
         dataset = TensorStoreDataset(store)

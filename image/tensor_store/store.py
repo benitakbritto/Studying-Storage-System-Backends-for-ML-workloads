@@ -17,7 +17,7 @@ class TSStore():
     
     def __init__(self, input_path):
         self.input_data = PrepareData(input_path).getInputData()
-        self.dataset = ts.open({
+        self.db = ts.open({
             'driver': 'n5',
             'kvstore': {
                 'driver': 'file',
@@ -52,7 +52,7 @@ class TSStore():
             labels = labels.reshape(size, constants.LABEL_SIZE)
             images = images.reshape(size, constants.IMAGE_SIZE)
             imlabels = torch.cat((images, labels), -1)
-            self.dataset[i:i+size, :].write(imlabels).result()
+            self.db[i:i+size, :].write(imlabels).result()
             i+=size
         
         self.size = i
