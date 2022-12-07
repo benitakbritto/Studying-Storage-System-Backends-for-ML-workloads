@@ -9,9 +9,10 @@ Dataset: TODO
 
 ### Datasets
 1. [Twitter Dataset](https://www.kaggle.com/datasets/kazanova/sentiment140)
-2. [ImageNet Dataset](https://image-net.org/download-images.php) -- TODO: can we remove this?
-3. [CIFAR-100](https://www.kaggle.com/datasets/fedesoriano/cifar100)
-4. [FB15K-237](https://www.microsoft.com/en-us/download/details.aspx?id=52312), [Papers with Code](https://paperswithcode.com/dataset/fb15k-237)
+2. [CIFAR-100](https://www.kaggle.com/datasets/fedesoriano/cifar100)
+3. [FB15K-237](https://www.microsoft.com/en-us/download/details.aspx?id=52312), [Papers with Code](https://paperswithcode.com/dataset/fb15k-237)
+
+Note: All datasets were stored under the path `/mnt/data/datasets`
 
 ### Modified Dataset
 Concatenate the dataset for each ML workload to move a larger version of it (TODO: Add path to util)
@@ -46,3 +47,42 @@ TODO
 
 ### TODO GRAPHS
 - Increase batch size in dataloader and note elapsed time
+
+## Experiments
+The scripts are present in the `/scripts` dir. Prequesite to running the scripts is to create the output directories using `/scripts/make_output_folders.sh`. The results for the tests will be stored here.  
+
+We test the performance across different ML (text, image, graph) workloads on input data (using map and iterable style dataloaders) and intermediate data (embeddings). We further tune the follwing parameters: 
+
+### Parameters: Map style dataloader
+- input file size
+- number of workers (only for TileDB, TensorStore)
+- batch size
+- number of input rows per key (only for RocksDB)
+
+### Parameters: Iterable style dataloader
+- input file size
+- number of workers (only for TileDB, TensorStore)
+- batch size
+- prefetch size
+
+### Intermediate data
+TODO
+
+### Workloads
+#### Text
+`1. Concatenate input dataset`
+`2. Run map style script from /scripts/text/map_style.sh`
+`3. Run iterable style script from /scripts/text/iterable_style.sh`
+
+#### Image
+`1. Concatenate input dataset`
+`2. Run map style script from /scripts/text/map_style.sh`
+`3. Run iterable style script from /scripts/text/iterable_style.sh`
+
+#### Graph
+`1. Concatenate input dataset`
+`2. Run map style script from /scripts/text/map_style.sh`
+`3. Run iterable style script from /scripts/text/iterable_style.sh`
+
+#### Embedding
+TODO
