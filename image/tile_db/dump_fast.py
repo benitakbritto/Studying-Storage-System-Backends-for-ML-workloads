@@ -45,7 +45,7 @@ def dump_to_db(root_dir, tile_uri):
     image_len = 3*32*32
     np_tuple_type = ','.join('f4' for _ in range(0, 3 * 32* 32))
 
-    create_tiledb_schema(rows_count=len(trainset), np_tuple_type)
+    create_tiledb_schema(rows_count=len(trainset), np_tuple_type=np_tuple_type)
 
     trainloader = DataLoader(trainset, batch_size=batch_size,
                                             shuffle=False, num_workers=max_workers)
