@@ -49,7 +49,7 @@ TODO
 - Increase batch size in dataloader and note elapsed time
 
 ## Experiments
-The scripts are present in the `/scripts` dir. Prequesite to running the scripts is to create the output directories using `/scripts/make_output_folders.sh`. The results for the tests will be stored here.  
+The scripts are present in the `/scripts` dir. Prerequesite to running the scripts is to create the output directories using `/scripts/make_output_folders.sh`. The results for the tests will be stored here.  
 
 We test the performance across different ML (text, image, graph) workloads on input data (using map and iterable style dataloaders) and intermediate data (embeddings). We further tune the follwing parameters: 
 
@@ -65,24 +65,24 @@ We test the performance across different ML (text, image, graph) workloads on in
 - batch size
 - prefetch size
 
-### Intermediate data
+### Parameters: Intermediate data
 TODO
 
 ### Workloads
 #### Text
-`1. Concatenate input dataset`
-`2. Run map style script from /scripts/text/map_style.sh`
-`3. Run iterable style script from /scripts/text/iterable_style.sh`
+`1. Concatenate input dataset`  
+`2. Run map style script from /scripts/text/map_style.sh`  
+`3. Run iterable style script from /scripts/text/iterable_style.sh`  
 
 #### Image
-`1. Concatenate input dataset`
-`2. Run map style script from /scripts/text/map_style.sh`
-`3. Run iterable style script from /scripts/text/iterable_style.sh`
+`1. Concatenate input dataset`  
+`2. Run map style script from /scripts/text/map_style.sh`  
+`3. Run iterable style script from /scripts/text/iterable_style.sh`  
 
 #### Graph
-`1. Concatenate input dataset`
-`2. Run map style script from /scripts/text/map_style.sh`
-`3. Run iterable style script from /scripts/text/iterable_style.sh`
+`1. Concatenate input dataset`  
+`2. Run map style script from /scripts/text/map_style.sh`  
+`3. Run iterable style script from /scripts/text/iterable_style.sh`  
 
 #### Embedding
 TODO
