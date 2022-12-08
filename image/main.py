@@ -122,7 +122,7 @@ def run_test():
             if args.type == 'i':
                 dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 

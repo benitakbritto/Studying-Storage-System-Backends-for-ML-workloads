@@ -103,11 +103,6 @@ def run_test():
                     batch_size=int(args.batch_size))
 
         elif args.ds == 'td':
-            dataset = TileDBIterableDataset(cache_len=args.pf, 
-                start=0, 
-                end=get_dataset_count())
-            dataloader = DataLoader(dataset=dataset)
-
             # dump to db
             root_dir = str(Path(args.input_file).parent)
 
@@ -130,7 +125,7 @@ def run_test():
                     end=get_dataset_count(tile_uri=tile_uri), 
                     tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(), 
+                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), 
                     tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, 
