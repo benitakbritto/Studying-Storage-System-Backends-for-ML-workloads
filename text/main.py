@@ -116,7 +116,7 @@ def run_test():
 
             # switch to input file name from args
             dataset_uri = args.input_file
-            tile_uri = root_dir + "twitter.tldb"
+            tile_uri = root_dir + "/twitter.tldb"
 
             # destroy path
             if os.path.exists(tile_uri):
