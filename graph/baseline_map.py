@@ -28,7 +28,7 @@ parser.add_argument("-input-path",
 
 class BaselineGraphDataset(Dataset):
     def __init__(self, input_file):
-        self.df = list(pd.read_csv(input_file, sep="\t", header=None))
+        self.df = pd.read_csv(input_file, sep="\t", header=None).values.tolist()
 
     def __getitem__(self, index):
         return self.df[index]
@@ -53,7 +53,7 @@ if __name__=='__main__':
                     num_workers=int(args.num_workers))
         
     for _, data in enumerate(dataloader):
-        print(data)
+        pass
     
     end = time.time()
     print(f'time to load = {end - start}s')
