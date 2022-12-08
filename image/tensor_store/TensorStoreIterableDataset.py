@@ -31,3 +31,14 @@ class TensorStoreIterableDataset(IterableDataset):
             iter_end = min(iter_start + per_worker, self.end)
         
         return TensorStoreImageIterator(cache_len = self.cache_len, start = iter_start, end = iter_end)
+
+# if __name__=='__main__':
+#     dataset = TensorStoreIterableDataset(0, 50000, 50000)
+#     output = list(DataLoader(
+#                 dataset,
+#                 batch_size = 1024, 
+#                 shuffle=False, 
+#                 num_workers=16
+#             ))
+
+#     print(f'Items read = {output[0]}')

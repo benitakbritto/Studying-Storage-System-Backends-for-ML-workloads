@@ -17,17 +17,9 @@ class TensorStoreImageIterator():
             'kvstore': {
                 'driver': 'file',
                 'path': constants.PATH_TO_KV_STORE ,
-            },
-            'metadata': {
-                'compression': {
-                    'type': 'raw'
-                },
-                'dataType': 'float32',
-                'dimensions': [constants.INPUT_SIZE, constants.IMAGE_SIZE + constants.LABEL_SIZE],
-                'blockSize': [1024, 3073],
-            },
+            }
         }).result()
-        
+
         # cache stores
         self.image = []
 
