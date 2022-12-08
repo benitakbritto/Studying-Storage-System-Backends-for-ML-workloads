@@ -46,6 +46,11 @@ parser.add_argument("-batch-size",
     help="Batch size for the dataloader",
     default=256,
     required=False)
+parser.add_argument("-itr",
+    help="Number of iterations to run test",
+    default=1,
+    required=False)
+
 
 # Read arguments from command line
 args = parser.parse_args()
