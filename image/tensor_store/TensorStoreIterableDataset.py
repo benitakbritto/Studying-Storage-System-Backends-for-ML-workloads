@@ -5,15 +5,14 @@
     @authors: Benita, Hemal, Reetuparna
 '''
 
-from torch.utils.data import DataLoader, IterableDataset, get_worker_info
+from torch.utils.data import IterableDataset, get_worker_info
 import math
 from tensor_store.TensorStoreImageIterator import TensorStoreImageIterator
 
 class TensorStoreIterableDataset(IterableDataset):
 
-    def __init__(self, db, start, end, cache_len):
+    def __init__(self, start, end, cache_len):
         # assert end > start, "this example code only works with end > start"
-        self.db = db
         self.start = start
         self.end = end
         self.cache_len = cache_len
@@ -31,4 +30,4 @@ class TensorStoreIterableDataset(IterableDataset):
             iter_start = self.start + worker_id * per_worker
             iter_end = min(iter_start + per_worker, self.end)
         
-        return TensorStoreImageIterator(db = self.db, cache_len = self.cache_len, start = iter_start, end = iter_end)
+        return TensorStoreImageIterator(cache_len = self.cache_len, start = iter_start, end = iter_end)

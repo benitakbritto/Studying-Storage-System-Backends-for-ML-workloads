@@ -5,13 +5,28 @@
     @authors: Benita, Hemal, Reetuparna
 '''
 
-
+import tensorstore as ts
+import tensor_store.constants as constants
 from torch.utils.data import Dataset
 
 class TensorStoreDataset(Dataset):
     
-    def __init__(self, store):
-        self.db = store.db
+    def __init__(self):
+        self.db = ts.open({
+            'driver': 'n5',
+            'kvstore': {
+                'driver': 'file',
+                'path': constants.PATH_TO_KV_STORE ,
+            },
+            'metadata': {
+                'compression': {
+                    'type': 'raw'
+                },
+                'dataType': 'float32',
+                'dimensions': [constants.INPUT_SIZE, constants.IMAGE_SIZE + constants.LABEL_SIZE],
+                'blockSize': [1024, 3073],
+            },
+        }).result()
 
     def __getitem__(self, index):
         data = self.db[index : index+1, : ].read().result()
