@@ -115,11 +115,11 @@ def run_test():
             root_dir = args.input_file
             tile_uri = root_dir + "/cifar100.tldb"
 
-            # destroy path
-            if os.path.exists(tile_uri):
-                shutil.rmtree(tile_uri)
-
             if not args.skip_write:
+                # destroy path
+                if os.path.exists(tile_uri):
+                    shutil.rmtree(tile_uri)
+                    
                 start = time.time()
                 tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
                 end = time.time()

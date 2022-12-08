@@ -113,11 +113,11 @@ def run_test():
             dataset_uri = args.input_file
             tile_uri = root_dir + "/fb15k-237.tldb"
 
-            # destroy path
-            if os.path.exists(tile_uri):
-                shutil.rmtree(tile_uri)
-
             if not args.skip_write:
+                # destroy path
+                if os.path.exists(tile_uri):
+                    shutil.rmtree(tile_uri)
+                    
                 start = time.time()
                 tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
                 end = time.time()
