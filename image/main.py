@@ -12,6 +12,7 @@ from tensor_store.store import TSStore
 from tensor_store.data_loader import TensorStoreDataset
 from tensor_store.TensorStoreIterableDataset import TensorStoreIterableDataset
 import rocksDB.db_util
+from multiprocessing import Process
 
 
 # Initialize parser
@@ -45,10 +46,18 @@ parser.add_argument("-batch-size",
     help="Batch size for the dataloader",
     default=256,
     required=False)
+parser.add_argument("-itr",
+    help="Number of iterations to run test",
+    default=1,
+    required=False)
+
 
 # Read arguments from command line
 args = parser.parse_args()
 
+def ingest_to_ts(filename):
+    store = TSStore(filename)
+    store.ingest_data()
 
 def run_test():
     print(f'ds = {args.ds} | \
@@ -88,12 +97,12 @@ def run_test():
                     dataset,
                     batch_size=int(args.batch_size),
                     shuffle=False, 
-                    num_workers=args.num_workers
+                    num_workers=int(args.num_workers)
                 )
             elif args.type == 'i':
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, 
-                    num_workers=0, 
+                    num_workers=int(args.num_workers), 
                     batch_size=int(args.batch_size))
 
         elif args.ds == 'td':
@@ -109,31 +118,27 @@ def run_test():
             tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
             end = time.time()
 
-            print(f'{args.ds} Store time = {end - start} s')
-
             # prepare dataset and dataloader
             if args.type == 'i':
                 dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
         elif args.ds == 'ts':
-            store = TSStore(args.input_file)
-            # store.cleanup()
-            # Ingest data
             start = time.time()
-            store.ingest_data()
+            ingest_process = Process(target=ingest_to_ts, args={args.input_file,})
+            ingest_process.start()
+            ingest_process.join()
             end = time.time()
-
-            print(f'{args.ds} Store time = {end - start} s')
 
             # Set Dataloader
             if args.type == 'i':
-                dataset = TensorStoreIterableDataset(db=store.db, start=0, end=store.size, cache_len=int(args.pf))
+                #TODO get input size from args or constants
+                dataset = TensorStoreIterableDataset(start=0, end=50000, cache_len=int(args.pf))
             elif args.type == 'm':
-                dataset = TensorStoreDataset(store)
+                dataset = TensorStoreDataset()
             else:
                 raise NotImplementedError("Not implemented")
                 
@@ -141,7 +146,7 @@ def run_test():
                 dataset,
                 batch_size = int(args.batch_size), 
                 shuffle=False, 
-                num_workers=0 #Seg-faults on increasing
+                num_workers=int(args.num_workers)
             )
 
         else:

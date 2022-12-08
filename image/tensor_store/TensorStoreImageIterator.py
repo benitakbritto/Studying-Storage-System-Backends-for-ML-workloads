@@ -10,9 +10,16 @@ import tensor_store.constants as constants
 
 class TensorStoreImageIterator():
     
-    def __init__(self, db, cache_len, start, end):
+    def __init__(self, cache_len, start, end):
         
-        self.db = db
+        self.db = ts.open({
+            'driver': 'n5',
+            'kvstore': {
+                'driver': 'file',
+                'path': constants.PATH_TO_KV_STORE ,
+            }
+        }).result()
+
         # cache stores
         self.image = []
 

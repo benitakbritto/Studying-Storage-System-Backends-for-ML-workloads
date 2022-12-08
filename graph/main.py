@@ -45,6 +45,11 @@ parser.add_argument("-batch-size",
     help="Batch size for the dataloader",
     default=256,
     required=False)
+parser.add_argument("-itr",
+    help="Number of iterations to run test",
+    default=1,
+    required=False)
+
 
 # Read arguments from command line
 args = parser.parse_args()
@@ -86,14 +91,13 @@ def run_test():
                 dataloader = DataLoader(
                     dataset,
                     batch_size=int(args.batch_size),
-                    shuffle=False, 
                     num_workers=int(args.num_workers)
                 )
 
             elif args.type == 'i':
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, 
-                    num_workers=0, 
+                    num_workers=int(args.num_workers), 
                     batch_size=int(args.batch_size))
 
         elif args.ds == 'td':
@@ -112,13 +116,11 @@ def run_test():
             tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
             end = time.time()
 
-            print(f'{args.ds} Store time = {end - start} s')
-
             # prepare dataset and dataloader
             if args.type == 'i':
                 dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(), tile_uri=tile_uri)
+                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
@@ -135,15 +137,12 @@ def run_test():
 
             end = time.time()
 
-            print(f'{args.ds} Store time = {end - start} s')
-
             # Set Dataloader
             if args.type == 'm':
                 dataset = TensorStoreDataset(store.db)
                 dataloader = DataLoader(
                     dataset,
                     batch_size = int(args.batch_size), 
-                    shuffle=False, 
                     num_workers=int(args.num_workers)
                 )
             elif args.type == 'i':

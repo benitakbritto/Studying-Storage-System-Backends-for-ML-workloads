@@ -6,7 +6,7 @@
 '''
 
 import torch
-from rocksdict import Rdict
+from rocksdict import Rdict, AccessType
 from torch.utils.data import Dataset
 import rocksDB.helper as bytes
 import rocksDB.constants
@@ -16,7 +16,8 @@ import io
 
 class RocksDBMapStyleDataset(Dataset):
     def __init__(self):
-        self.db = Rdict(rocksDB.constants.DB_PATH)
+        self.db = Rdict(rocksDB.constants.DB_PATH,
+            access_type = AccessType.read_only(False))
         self.num_keys = bytes.bytes_to_int(self.db[rocksDB.constants.NUM_KEYS.encode()])
         # print(f'[DEBUG] num_keys = {self.num_keys}')
         self.rows_in_key = bytes.bytes_to_int(self.db[rocksDB.constants.NUM_ROWS_PER_KEY.encode()])

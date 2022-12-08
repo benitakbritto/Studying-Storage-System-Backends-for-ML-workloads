@@ -3,7 +3,7 @@ BLUE='\033[0;44m'
 NOCOLOR='\033[0m'
 
 # Constants
-INPUTFILE=../../../../../../mnt/data/dataset/cifar/
+INPUTFILE=../../../../../mnt/data/dataset/cifar/
 INPUTFILESIZE=1
 TYPE=i
 WORKLOAD=image
@@ -11,81 +11,60 @@ ITR=1
 
 # RocksDB
 DS=rd
-WORKERS=0
 ROWSPERKEY=1
-prefetchsize=1
-for i in $(seq 0 1 10)
+for workers in 0 8 16 32
 do
-    PF=$prefetchsize
-    batchsize=1
-    for j in $(seq 0 1 10)
+    WORKERS=$workers
+    for prefetchsize in 128 256 512 1024
     do
-        BATCHSIZE=$batchsize
-        OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE_p$prefetchsize
-        
-        echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
-        python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pd $PF > $OUTPUTFILE
-        
-        # go to next batch size
-        batchsize=$(( $batchsize*2 ))
+        PF=$prefetchsize
+        for batchsize in 128 256 512 1024
+        do
+            BATCHSIZE=$batchsize
+            OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}_p${PF}"
+            
+            echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
+            python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pf $PF > $OUTPUTFILE
+        done
     done
-
-    # go to next prefetch size
-    prefetchsize=$(( $prefetchsize*2 ))
 done
 
 # TileDB
-DS=td
-ROWSPERKEY=1
-for workers in $(seq 0 8 32)
-do 
-    WORKERS=$workers
-    prefetchsize=1
-    for i in $(seq 0 1 10)
-    do
-        PF=$prefetchsize
-        batchsize=1
-        for j in $(seq 0 1 10)
-        do
-            BATCHSIZE=$batchsize
-            OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE_p$prefetchsize
+# DS=td
+# ROWSPERKEY=1
+# for workers in 0 8 16 32
+# do 
+#     WORKERS=$workers
+#     for prefetchsize in 128 256 512 1024
+#     do
+#         PF=$prefetchsize
+#         for batchsize in 128 256 512 1024
+#         do
+#             BATCHSIZE=$batchsize
+#             OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}_p${PF}"
             
-            echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
-            python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pd $PF > $OUTPUTFILE
-            
-            # go to next batch size
-            batchsize=$(( $batchsize*2 ))
-        done
-
-        # go to next prefetch size
-        prefetchsize=$(( $prefetchsize*2 ))
-    done
-done
+#             echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
+#             python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pf $PF > $OUTPUTFILE
+#         done
+#     done
+# done
     
 # Tensorstore
-DS=td
+DS=ts
 ROWSPERKEY=1
-for workers in $(seq 0 8 32)
+for workers in 0 8 16 32
 do 
     WORKERS=$workers
-    prefetchsize=1
-    for i in $(seq 0 1 10)
+    for prefetchsize in 128 256 512 1024
     do
         PF=$prefetchsize
-        batchsize=1
-        for j in $(seq 0 1 10)
+        for batchsize in 128 256 512 1024
         do
             BATCHSIZE=$batchsize
-            OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE_p$prefetchsize
+            OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}_p${PF}"
             
             echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
-            python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pd $PF > $OUTPUTFILE
-            
-            # go to next batch size
-            batchsize=$(( $batchsize*2 ))
+            python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pf $PF > $OUTPUTFILE            
         done
-
-        # go to next prefetch size
-        prefetchsize=$(( $prefetchsize*2 ))
     done
 done

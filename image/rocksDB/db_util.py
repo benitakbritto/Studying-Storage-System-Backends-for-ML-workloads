@@ -1,3 +1,4 @@
 from rocksdict import Rdict
 
-Rdict.destroy('../db_path')
+def delete_db():
+    Rdict.destroy('../db_path')

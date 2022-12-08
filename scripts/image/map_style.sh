@@ -3,72 +3,59 @@ BLUE='\033[0;44m'
 NOCOLOR='\033[0m'
 
 # Constants
-INPUTFILE=../../../../../../mnt/data/dataset/cifar/
+INPUTFILE=../../../../../mnt/data/dataset/cifar/
 INPUTFILESIZE=1
 TYPE=m
 WORKLOAD=image
 ITR=1
 
 # RocksDB
-DS=rd
-WORKERS=0
-rowsperkeysize=1
-for i in $(seq 0 1 10)
-do
-    ROWSPERKEY=$rowsperkeysize
-    batchsize=1
-    for j in $(seq 0 1 10)
-    do
-        BATCHSIZE=$batchsize
-        OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE
-        
-        echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE} ${NOCOLOR}"
-        python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
-        
-        # go to next batch size
-        batchsize=$(( $batchsize*2 ))
-    done
-
-    # go to next rows per key size
-    rowsperkeysize=$(( $rowsperkeysize*2 ))
-done
+# DS=rd
+# for workers in 0 8 16 32
+# do
+#     WORKERS=$workers
+#     for rowsperkeysize in 1 128 256 512 1024
+#     do
+#         ROWSPERKEY=$rowsperkeysize
+#         for batchsize in 128 256 512 1024
+#         do
+#             BATCHSIZE=$batchsize
+#             OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}"
+            
+#             echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE} ${NOCOLOR}"
+#             python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
+#         done
+#     done
+# done
 
 # TileDB
-DS=td
-ROWSPERKEY=1
-for workers in $(seq 0 8 32)
-do 
-    WORKERS=$workers
-    batchsize=1
-    for i in $(seq 0 1 10)
-    do
-        BATCHSIZE=$batchsize
-        OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE
+# DS=td
+# ROWSPERKEY=1
+# for workers in 0 8 16 32
+# do 
+#     WORKERS=$workers
+#     for batchsize in 128 256 512 1024
+#     do
+#         BATCHSIZE=$batchsize
+#         OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}"
         
-        echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE} ${NOCOLOR}"
-        python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
-        
-        # go to next batch size
-        batchsize=$(( $batchsize*2 ))
-    done
-done
+#         echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE} ${NOCOLOR}"
+#         python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
+#     done
+# done
     
 # Tensorstore
-DS=td
+DS=ts
 ROWSPERKEY=1
-for workers in $(seq 0 8 32)
+for workers in 0 8 16 32
 do 
     WORKERS=$workers
-    batchsize=1
-    for i in $(seq 0 1 10)
+    for batchsize in 128 256 512 1024
     do
         BATCHSIZE=$batchsize
-        OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE
+        OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}"
         
         echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE} ${NOCOLOR}"
-        python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
-        
-        # go to next batch size
-        batchsize=$(( $batchsize*2 ))
+        python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
     done
 done

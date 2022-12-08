@@ -92,7 +92,6 @@ def run_test():
                 dataloader = DataLoader(
                     dataset,
                     batch_size=int(args.batch_size),
-                    shuffle=False, 
                     num_workers=int(args.num_workers)
                 )
             elif args.type == 'i':
@@ -100,15 +99,10 @@ def run_test():
                     start=0, 
                     end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, 
-                    num_workers=0, 
+                    num_workers=int(args.num_workers), 
                     batch_size=int(args.batch_size))
 
         elif args.ds == 'td':
-            dataset = TileDBIterableDataset(cache_len=args.pf, 
-                start=0, 
-                end=get_dataset_count())
-            dataloader = DataLoader(dataset=dataset)
-
             # dump to db
             root_dir = str(Path(args.input_file).parent)
 
@@ -122,6 +116,7 @@ def run_test():
 
             start = time.time()
             tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+            end = time.time()
 
             # prepare dataset and dataloader
             if args.type == 'i':
@@ -130,7 +125,7 @@ def run_test():
                     end=get_dataset_count(tile_uri=tile_uri), 
                     tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(), 
+                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), 
                     tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, 
@@ -149,8 +144,6 @@ def run_test():
             loop.close()
 
             end = time.time()
-
-            print(f'{args.ds} Store time = {end - start} s')
 
             # Set Dataloader
             if args.type == 'm':
