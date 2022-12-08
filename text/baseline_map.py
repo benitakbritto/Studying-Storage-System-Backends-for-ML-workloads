@@ -30,7 +30,7 @@ class BaselineTextDataset(Dataset):
         self.df = pd.read_csv(input_file)
 
     def __getitem__(self, index):
-        return self.df[index]
+        return self.df.loc[index]
     
     def __len__(self):
         return self.df.size
