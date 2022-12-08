@@ -20,7 +20,6 @@ class TSStore():
 
         with open(self.input_path, 'r') as file:
             for line in file:
-
                 key_in_bytes = int_to_bytes(row_index)
                 val_in_bytes = convert_tensor_to_bytes(line)
                 await self.db.write(key_in_bytes, val_in_bytes)
