@@ -24,7 +24,7 @@ do
         for j in $(seq 0 1 10)
         do
             BATCHSIZE=$batchsize
-            OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE_p$prefetchsize
+            OUTPUTFILE="../../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${type}_b${BATCHSIZE}_p${PF}"
             
             echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
             python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pd $PF > $OUTPUTFILE
@@ -52,7 +52,7 @@ do
         for j in $(seq 0 1 10)
         do
             BATCHSIZE=$batchsize
-            OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE_p$prefetchsize
+            OUTPUTFILE="../../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${type}_b${BATCHSIZE}_p${PF}"
             
             echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
             python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pd $PF > $OUTPUTFILE
@@ -80,7 +80,7 @@ done
 #         for j in $(seq 0 1 10)
 #         do
 #             BATCHSIZE=$batchsize
-#             OUTPUTFILE=../../output/$DS/$WORKLOAD/i$INPUTFILESIZE_w$WORKERS_r$ROWSPERKEY_t$type_b$BATCHSIZE_p$prefetchsize
+#             OUTPUTFILE="../../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${type}_b${BATCHSIZE}_p${PF}"
             
 #             echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
 #             python ../../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pd $PF > $OUTPUTFILE
