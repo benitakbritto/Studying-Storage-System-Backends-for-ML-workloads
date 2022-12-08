@@ -121,6 +121,7 @@ def run_test():
 
             start = time.time()
             tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+            end = time.time()
 
             # prepare dataset and dataloader
             if args.type == 'i':
@@ -148,8 +149,6 @@ def run_test():
             loop.close()
 
             end = time.time()
-
-            print(f'{args.ds} Store time = {end - start} s')
 
             # Set Dataloader
             if args.type == 'm':

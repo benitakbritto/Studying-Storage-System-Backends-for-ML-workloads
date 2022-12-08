@@ -116,8 +116,6 @@ def run_test():
             tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
             end = time.time()
 
-            print(f'{args.ds} Store time = {end - start} s')
-
             # prepare dataset and dataloader
             if args.type == 'i':
                 dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
@@ -138,8 +136,6 @@ def run_test():
             loop.close()
 
             end = time.time()
-
-            print(f'{args.ds} Store time = {end - start} s')
 
             # Set Dataloader
             if args.type == 'm':
