@@ -112,18 +112,13 @@ def get_file_content(file_name):
     write_time = 0
     read_time = 0
 
-    # TODO: Fix this for data loader time, lots of raising ex
     with open(file_name) as f:
         for index, line in enumerate(f):
-                if index == 2:
-                    line = line.split()
-                    write_time = float(line[3])
-                elif index == 3 and type == 'm':
-                    line = line.split()
-                    read_time = float(line[4])
-                elif index == 4 and type == 'i':
-                    line = line.split()
-                    read_time = float(line[4])
+            line = line.split()
+            if len(line) == 5 and line[1] == 'Write':
+                write_time = float(line[3])
+            elif len(line) == 6 and line[1] == 'Dataloader':
+                read_time = float(line[4])
 
     return write_time, read_time
 
