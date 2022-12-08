@@ -102,7 +102,7 @@ def run_test():
 
             # switch to input file name from args
             dataset_uri = args.input_file
-            tile_uri = root_dir + "fb15k-237.tldb"
+            tile_uri = root_dir + "/fb15k-237.tldb"
 
             # destroy path
             if os.path.exists(tile_uri):
