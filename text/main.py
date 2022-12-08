@@ -51,6 +51,11 @@ parser.add_argument("-itr",
     help="Number of iterations to run test",
     default=1,
     required=False)
+parser.add_argument("-skip-write",
+    help="Skip write to data store",
+    default=False,
+    required=False)
+
 
 # Read arguments from command line
 args = parser.parse_args()
@@ -75,16 +80,18 @@ def run_test():
 
         if args.ds == 'rd':
             # Store data in rocks db
-            start = time.time()
+            if not args.skip_write:
+                rocksDB.db_util.delete_db()
 
-            store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
-            store.store_data()
-            store.store_metadata()
-            
-            end = time.time()
+                start = time.time()
 
-            total_rows = store.get_total_input_rows()
-            store.cleanup()
+                store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
+                store.store_data()
+                store.store_metadata()
+                
+                end = time.time()
+
+                store.cleanup()
 
             # Set Dataloader
             if args.type == 'm':
@@ -95,6 +102,7 @@ def run_test():
                     num_workers=int(args.num_workers)
                 )
             elif args.type == 'i':
+                total_rows = rocksDB.db_util.get_total_input_rows()
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), 
                     start=0, 
                     end=int(total_rows))
@@ -114,9 +122,10 @@ def run_test():
             if os.path.exists(tile_uri):
                 shutil.rmtree(tile_uri)
 
-            start = time.time()
-            tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
-            end = time.time()
+            if not args.skip_write:
+                start = time.time()
+                tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
+                end = time.time()
 
             # prepare dataset and dataloader
             if args.type == 'i':
@@ -137,13 +146,16 @@ def run_test():
             # store.cleanup()
             # Ingest data
             loop = asyncio.get_event_loop()
-            start = time.time()
-            task = [loop.create_task(store.ingestData())]
 
-            loop.run_until_complete(asyncio.wait(task)) 
-            loop.close()
+            if not args.skip_write:
+                os.system('sudo rm -rf /mnt/data/store')
+                start = time.time()
+                task = [loop.create_task(store.ingestData())]
 
-            end = time.time()
+                loop.run_until_complete(asyncio.wait(task)) 
+                loop.close()
+
+                end = time.time()
 
             # Set Dataloader
             if args.type == 'm':
@@ -160,7 +172,8 @@ def run_test():
         else:
             raise NotImplementedError("Not implemented")
 
-        print(f'{args.ds} Write = {end - start} s')
+        if not args.skip_write:
+            print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader
         start = time.time()
@@ -173,7 +186,3 @@ def run_test():
 
 if __name__ == "__main__":
     run_test()
-
-    # cleanup
-    if args.ds == 'rd':
-        rocksDB.db_util.delete_db()
