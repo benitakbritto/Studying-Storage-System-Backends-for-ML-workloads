@@ -50,7 +50,10 @@ parser.add_argument("-itr",
     help="Number of iterations to run test",
     default=1,
     required=False)
-
+parser.add_argument("-skip-write",
+    help="Skip write to data store",
+    default=False,
+    required=False)
 
 # Read arguments from command line
 args = parser.parse_args()
@@ -79,16 +82,17 @@ def run_test():
 
         if args.ds == 'rd':
             # Store data in rocks db
-            start = time.time()
+            if not args.skip_write:
+                rocksDB.db_util.delete_db()
+                start = time.time()
 
-            store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
-            store.store_data()
-            store.store_metadata()
-            
-            end = time.time()
+                store = RocksDBStore(args.input_file, int(args.input_rows_per_key))
+                store.store_data()
+                store.store_metadata()
+                
+                end = time.time()
 
-            total_rows = store.get_total_input_rows()
-            store.cleanup()
+                store.cleanup()
 
             # Set Dataloader
             if args.type == 'm':
@@ -100,6 +104,7 @@ def run_test():
                     num_workers=int(args.num_workers)
                 )
             elif args.type == 'i':
+                total_rows = rocksDB.db_util.get_total_input_rows()
                 dataset = RocksDBIterableDataset(cache_len=int(args.pf), start=0, end=int(total_rows))
                 dataloader = DataLoader(dataset=dataset, 
                     num_workers=int(args.num_workers), 
@@ -110,13 +115,14 @@ def run_test():
             root_dir = args.input_file
             tile_uri = root_dir + "/cifar100.tldb"
 
-            # destroy path
-            if os.path.exists(tile_uri):
-                shutil.rmtree(tile_uri)
-
-            start = time.time()
-            tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
-            end = time.time()
+            if not args.skip_write:
+                # destroy path
+                if os.path.exists(tile_uri):
+                    shutil.rmtree(tile_uri)
+                    
+                start = time.time()
+                tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
+                end = time.time()
 
             # prepare dataset and dataloader
             if args.type == 'i':
@@ -127,11 +133,13 @@ def run_test():
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
         elif args.ds == 'ts':
-            start = time.time()
-            ingest_process = Process(target=ingest_to_ts, args={args.input_file,})
-            ingest_process.start()
-            ingest_process.join()
-            end = time.time()
+            if not args.skip_write:
+                os.system('sudo rm -rf /mnt/data/store')
+                start = time.time()
+                ingest_process = Process(target=ingest_to_ts, args={args.input_file,})
+                ingest_process.start()
+                ingest_process.join()
+                end = time.time()
 
             # Set Dataloader
             if args.type == 'i':
@@ -152,8 +160,8 @@ def run_test():
         else:
             raise NotImplementedError("Not implemented")
 
-
-        print(f'{args.ds} Write = {end - start} s')
+        if not args.skip_write:
+            print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader
         start = time.time()
@@ -167,7 +175,4 @@ def run_test():
 
 if __name__ == "__main__":
     run_test()
-
-    # cleanup
-    if args.ds == 'rd':
-        rocksDB.db_util.delete_db()
+        

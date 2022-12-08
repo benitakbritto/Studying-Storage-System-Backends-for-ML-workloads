@@ -1,4 +1,13 @@
 from rocksdict import Rdict
+import rocksDB.helper as bytes
+import rocksDB.constants
+
+DB_PATH = './db_path'
 
 def delete_db():
-    Rdict.destroy('../db_path')
+    Rdict.destroy(DB_PATH)
+
+def get_total_input_rows():
+        val = Rdict(DB_PATH)[rocksDB.constants.NUM_OF_IMAGES.encode()]
+        assert val is not None
+        return bytes.bytes_to_int(val)
