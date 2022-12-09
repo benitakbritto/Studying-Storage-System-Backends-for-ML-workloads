@@ -15,6 +15,8 @@ from tensor_store.store import TSStore
 from tensor_store.TensorStoreDataset import TensorStoreDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 import rocksDB.db_util
+from baseline_iterable import BaselineTextIterableDataset 
+from baseline_map import BaselineTextDataset 
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -22,7 +24,7 @@ parser = argparse.ArgumentParser()
 # Adding  argument
 parser.add_argument("-ds", 
     help = "Backend Data Store. rd for RocksDB, ts for TensorStore, td for TileDB", 
-    choices=['rd', 'ts', 'td'],
+    choices=['rd', 'ts', 'td', 'base'],
     required=True)
 parser.add_argument("-pf",
     help="Number of items to prefetch within dataset",
@@ -171,10 +173,27 @@ def run_test():
             elif args.type == 'i':
                 raise NotImplementedError("Not implemented")
 
+        elif args.ds == 'base':
+
+            if args.type == 'm':
+                dataset = BaselineTextDataset(args.input_file)
+                workers = int(args.num_workers)
+
+            elif args.type == 'i':
+                dataset = BaselineTextIterableDataset(args.input_file)
+                workers = 0 #since we are reading the file sequentially, we cant parallelize the data sampling 
+                
+            dataloader = DataLoader(
+                                dataset,
+                                batch_size = int(args.batch_size), 
+                                shuffle=False,
+                                num_workers=workers) 
+        
+
         else:
             raise NotImplementedError("Not implemented")
 
-        if not args.skip_write:
+        if not args.skip_write and args.ds!='base':
             print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader

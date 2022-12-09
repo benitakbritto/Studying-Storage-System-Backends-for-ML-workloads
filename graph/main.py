@@ -13,6 +13,8 @@ from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 from tensor_store.store import TSStore
 from tensor_store.TensorStoreDataset import TensorStoreDataset
 import rocksDB.db_util
+from baseline_iterable import BaselineGraphIterableDataset
+from baseline_map import BaselineGraphDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -20,7 +22,7 @@ parser = argparse.ArgumentParser()
 # Adding  argument
 parser.add_argument("-ds", 
     help = "Backend Data Store. rd for RocksDB, ts for TensorStore, td for TileDB", 
-    choices=['rd', 'ts', 'td'],
+    choices=['rd', 'ts', 'td', 'base'],
     required=True)
 parser.add_argument("-pf",
     help="Number of items to prefetch within dataset",
@@ -157,11 +159,25 @@ def run_test():
             elif args.type == 'i':
                 raise NotImplementedError("Not implemented")
 
+        elif args.ds == 'base':
+            if args.type == 'm':
+                dataset = BaselineGraphDataset(args.input_file)
+            elif args.type == 'i':
+                dataset = BaselineGraphIterableDataset(args.input_file)
+            else:
+                raise NotImplementedError("Not implemented")
+
+            dataloader = DataLoader(
+                    dataset,
+                    batch_size = int(args.batch_size), 
+                    shuffle=False,
+                    num_workers=int(args.num_workers))
+        
         else:
             raise NotImplementedError("Not implemented")
 
 
-        if not args.skip_write:
+        if not args.skip_write and args.ds!='base':
             print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader
