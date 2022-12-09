@@ -21,13 +21,13 @@ parser.add_argument("-batch-size",
     help="Batch size for the dataloader",
     default=256,
     required=False)
-parser.add_argument("-input-path",
+parser.add_argument("-input-file",
     help="Path for input data",
     required=True)
 
 class BaselineTextDataset(Dataset):
     def __init__(self, input_file):
-        self.df = pd.read_csv(input_file)
+        self.df = pd.read_csv(input_file, encoding='ISO-8859-1')
 
     def __getitem__(self, index):
         return self.df.loc[index]
@@ -43,7 +43,7 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     start = time.time()
-    dataset = BaselineTextDataset(args.input_path)
+    dataset = BaselineTextDataset(args.input_file)
 
     dataloader = DataLoader(
                     dataset,
