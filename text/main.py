@@ -148,18 +148,20 @@ def run_test():
             loop = asyncio.get_event_loop()
 
             if not args.skip_write:
-                os.system('sudo rm -rf /mnt/data/store')
-                start = time.time()
-                task = [loop.create_task(store.ingestData())]
+                os.system('sudo rm -rf /mnt/data/store/*')
 
-                loop.run_until_complete(asyncio.wait(task)) 
-                loop.close()
+            start = time.time()
+            task = [loop.create_task(store.ingestData())]
 
-                end = time.time()
+            loop.run_until_complete(asyncio.wait(task)) 
+            loop.close()
+
+            end = time.time()
 
             # Set Dataloader
             if args.type == 'm':
                 dataset = TensorStoreDataset(store)
+
                 dataloader = DataLoader(
                     dataset,
                     batch_size = int(args.batch_size), 
