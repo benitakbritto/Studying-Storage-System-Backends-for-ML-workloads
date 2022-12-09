@@ -13,7 +13,7 @@ from tensor_store.data_loader import TensorStoreDataset
 from tensor_store.TensorStoreIterableDataset import TensorStoreIterableDataset
 import rocksDB.db_util
 from multiprocessing import Process
-
+from tensor_store.PrepareData import PrepareData
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 # Adding  argument
 parser.add_argument("-ds", 
     help = "Backend Data Store. rd for RocksDB, ts for TensorStore, td for TileDB", 
-    choices=['rd', 'ts', 'td'],
+    choices=['rd', 'ts', 'td', 'base'],
     required=True)
 parser.add_argument("-pf",
     help="Number of items to prefetch within dataset",
@@ -157,10 +157,22 @@ def run_test():
                 num_workers=int(args.num_workers)
             )
 
+        elif args.ds == 'base':
+            if args.type == 'm':
+                dataset = PrepareData(args.input_file).getInputData() # map style
+            else:
+                raise NotImplementedError("Not implemented")
+
+            dataloader = DataLoader(
+                dataset,
+                batch_size = int(args.batch_size), 
+                shuffle=False,
+                num_workers=int(args.num_workers))
+
         else:
             raise NotImplementedError("Not implemented")
 
-        if not args.skip_write:
+        if not args.skip_write and args.ds!='base':
             print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader
