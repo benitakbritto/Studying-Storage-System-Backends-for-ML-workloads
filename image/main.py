@@ -124,11 +124,14 @@ def run_test():
                 tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
                 end = time.time()
 
+            # hardcoded as finding len programmatically causes workers freeze for some reason
+            size = 50000
+
             # prepare dataset and dataloader
             if args.type == 'i':
-                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=size, tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+                dataset = TileDBMapDataset(size=size, tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
