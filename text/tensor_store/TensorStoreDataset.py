@@ -14,7 +14,7 @@ class TensorStoreDataset(Dataset):
     
     def __init__(self, store):
         self.store = store
-        self.len = store.len
+        self.len = constants.INPUT_LEN
 
     def __len__(self):
         return self.len
