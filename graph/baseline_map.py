@@ -6,6 +6,7 @@
 '''
 
 from torch.utils.data import DataLoader, Dataset
+import torch
 import pandas as pd
 import time 
 import argparse
@@ -41,6 +42,11 @@ class BaselineGraphDataset(Dataset):
     def __len__(self):
         return len(self.dataset)
 
+    @staticmethod
+    def collate_fn(data):
+        # Important, pass through collate to obtain data in triplet form
+        return data
+
 
 if __name__=='__main__':
     # Example: python baseline_map.py -batch-size 1024 -num-workers 8 -input-path /mnt/data/dataset/fb15k-237/train.txt 
@@ -56,11 +62,12 @@ if __name__=='__main__':
                     dataset,
                     batch_size = int(args.batch_size), 
                     shuffle=False,
+                    collate_fn=BaselineGraphDataset.collate_fn,
                     num_workers=int(args.num_workers))
  
     for _, batch in enumerate(dataloader):
-        # import pdb; pdb.set_trace()
         pass
+
     
     end = time.time()
     print(f'time to load = {end - start}s')
