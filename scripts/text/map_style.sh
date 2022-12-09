@@ -81,7 +81,7 @@ do
     done
 done
 
-# Baseline
+# Baseline - NEEDS FIX!!!
 # DS=base
 # ROWSPERKEY=1
 # for workers in 0 8 16 32
