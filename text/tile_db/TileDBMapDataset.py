@@ -11,5 +11,5 @@ class TileDBMapDataset(Dataset):
 
     def __getitem__(self, idx):
         with tiledb.open(self.tile_uri, 'r') as A:
-            data = A.query(attrs=("target", "text"), coords=False, order='G')[idx]
-        return data["target"], data["text"]
+            data = A.query(attrs=("target", "text"), coords=False, order='G')[idx:idx+1]
+        return data["target"][0], data["text"][0]
