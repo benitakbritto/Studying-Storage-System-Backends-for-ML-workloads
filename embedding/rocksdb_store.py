@@ -8,7 +8,7 @@
 from BaseStore import BaseStore
 from rocksdict import Rdict, WriteBatch
 
-DB_PATH = './embedding_path'
+DB_PATH = './rocks_embedding_path'
 
 class RocksDBEmbedding(BaseStore):
     def __init__(self):

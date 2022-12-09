@@ -6,6 +6,7 @@ from EmbedddingIterableDataset import EmbedddingIterableDataset
 from torch.utils.data import DataLoader
 from rocksdb_store import RocksDBEmbedding
 from tiledb_store import TileDBEmbedding
+from ts_store import TSEmbedding
 from BaseStore import BaseStore
 
 # Initialize parser
@@ -74,7 +75,8 @@ for ds in ['rd', 'ts', 'td']:
     elif ds == 'td':
         store = TileDBEmbedding(rows_count=max_number, cols_count=emb_size, tile_uri=get_tile_uri(type))
     elif ds == 'ts':
-        pass
+        # dimensions must exactly match the rows_count, cols_count
+        store = TSEmbedding(rows_count=max_number, cols_count=emb_size)
     else:
         NotImplementedError("unsupported datastore")
 
