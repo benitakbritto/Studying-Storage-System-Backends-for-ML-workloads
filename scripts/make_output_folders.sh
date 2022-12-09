@@ -11,3 +11,7 @@ mkdir -p ../output/td/graph
 mkdir -p ../output/ts/text
 mkdir -p ../output/ts/image
 mkdir -p ../output/ts/graph
+
+mkdir -p ../output/base/text
+mkdir -p ../output/base/image
+mkdir -p ../output/base/graph

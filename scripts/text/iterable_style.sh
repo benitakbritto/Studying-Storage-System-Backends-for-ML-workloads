@@ -13,28 +13,28 @@ ITR=1
 DS=rd
 ROWSPERKEY=1
 WRITE=1
-for workers in 0 8 16 32
-do 
-    WORKERS=$workers
-    for prefetchsize in 128 256 512 1024
-    do
-        PF=$prefetchsize
-        for batchsize in 128 256 512 1024
-        do
-            BATCHSIZE=$batchsize
-            OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}_p${PF}"
+# for workers in 0 8 16 32
+# do 
+#     WORKERS=$workers
+#     for prefetchsize in 128 256 512 1024
+#     do
+#         PF=$prefetchsize
+#         for batchsize in 128 256 512 1024
+#         do
+#             BATCHSIZE=$batchsize
+#             OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}_p${PF}"
             
-            echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
-            if [ $WRITE -eq 1 ]
-            then
-                python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pf $PF > $OUTPUTFILE
-                WRITE=0
-            else
-                python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pf $PF -skip-write True > $OUTPUTFILE
-            fi
-        done
-    done
-done
+#             echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, PF={$PF} ${NOCOLOR}"
+#             if [ $WRITE -eq 1 ]
+#             then
+#                 python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pf $PF > $OUTPUTFILE
+#                 WRITE=0
+#             else
+#                 python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -num-workers $WORKERS -input-rows-per-key $ROWSPERKEY -type $TYPE -batch-size $BATCHSIZE -pf $PF -skip-write True > $OUTPUTFILE
+#             fi
+#         done
+#     done
+# done
 
 # TODO, when workers != 0, dataloader running forever
 # TileDB
@@ -91,3 +91,21 @@ done
 #         done
 #     done
 # done
+
+    
+# Baseline
+# python main.py -ds base -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv -type i
+DS=base
+ROWSPERKEY=1
+WRITE=1
+WORKERS=0
+
+batchsize=1
+for batchsize in 1024
+do
+    BATCHSIZE=$batchsize
+    OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}"
+    
+    echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, ${NOCOLOR}"
+    python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
+done
