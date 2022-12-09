@@ -28,13 +28,18 @@ parser.add_argument("-input-path",
 
 class BaselineGraphDataset(Dataset):
     def __init__(self, input_file):
-        self.df = pd.read_csv(input_file, sep="\t", header=None).values.tolist()
+        triples = list()
+        with open(input_file, 'r') as f:
+            for line in f:
+                head, relation, tail = line.strip().split('\t')
+                triples.append((head, relation, tail))
+        self.dataset = triples
 
     def __getitem__(self, index):
-        return self.df[index]
+        return self.dataset[index]
     
     def __len__(self):
-        return self.df.__len__()
+        return len(self.dataset)
 
 
 if __name__=='__main__':
@@ -44,15 +49,17 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     start = time.time()
+
     dataset = BaselineGraphDataset(args.input_path)
 
     dataloader = DataLoader(
-                    dataset,
+                    BaselineGraphDataset(args.input_path),
                     batch_size = int(args.batch_size), 
                     shuffle=False,
                     num_workers=int(args.num_workers))
-        
-    for _, data in enumerate(dataloader):
+ 
+    for _, batch in enumerate(dataloader):
+        # import pdb; pdb.set_trace()
         pass
     
     end = time.time()
