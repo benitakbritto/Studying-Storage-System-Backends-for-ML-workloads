@@ -5,11 +5,12 @@
     @authors: Benita, Hemal, Reetuparna
 '''
 
+from BaseStore import BaseStore
 from rocksdict import Rdict, WriteBatch
 
 DB_PATH = './embedding_path'
 
-class RocksDBEmbedding:
+class RocksDBEmbedding(BaseStore):
     def __init__(self):
         self.db = Rdict(DB_PATH)
 
