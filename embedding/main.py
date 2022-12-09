@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import argparse
+from data_gen import gen
 from EmbedddingIterableDataset import EmbedddingIterableDataset
 from torch.utils.data import DataLoader
 from rocksDB.store import RocksDBEmbedding
@@ -8,7 +9,7 @@ from rocksDB.store import RocksDBEmbedding
 # Initialize parser
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-data-size",
+parser.add_argument("-ds-size",
     help="Dataset size",
     required=False)
 
@@ -31,13 +32,26 @@ parser.add_argument("-ds",
     choices=['rd', 'ts', 'td'],
     required=True)
 
+parser.add_argument("-type", 
+    help = "power for Graph. zipf for Text", 
+    default='zipf',
+    choices=['power', 'zipf'],
+    required=False)
+
 # Read arguments from command line
 args = parser.parse_args()
 
+# collect params
 path = args.input_file
 batch_size = int(args.batch_size)
+ds_size = int(args.ds_size)
 emb_size = int(args.embed_size)
 ds = args.ds
+type = args.type
+input_file = args.input_file
+
+# create dataset, fetch the max numbers which is required for TensorStore and TileDB
+max_number = gen(type=type, size=ds_size, output_file=path)
 
 dataset = EmbedddingIterableDataset(path=path)
 dataloader = DataLoader(dataset, batch_size = batch_size)
