@@ -53,7 +53,7 @@ if __name__=='__main__':
     dataset = BaselineGraphDataset(args.input_path)
 
     dataloader = DataLoader(
-                    BaselineGraphDataset(args.input_path),
+                    dataset,
                     batch_size = int(args.batch_size), 
                     shuffle=False,
                     num_workers=int(args.num_workers))

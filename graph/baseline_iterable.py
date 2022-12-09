@@ -47,7 +47,7 @@ if __name__=='__main__':
     dataset = BaselineGraphIterableDataset(args.input_path)
 
     dataloader = DataLoader(
-                    BaselineGraphIterableDataset(args.input_path),
+                    dataset,
                     batch_size = int(args.batch_size), 
                     shuffle=False,
                     num_workers=0)
