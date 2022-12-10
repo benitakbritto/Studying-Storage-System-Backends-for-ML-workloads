@@ -1,7 +1,7 @@
 '''
     @brief: Transform all the output files -> csv
     @prereq: bash
-    @command: python parser.py -input-file ../output/*
+    @command: python parser.py -input-file ../../output/*/*/*
     @authors: Benita, Hemal, Reetuparna
 '''
 
@@ -49,7 +49,7 @@ def debug(ds, dataloader_type):
     global count_td_map
     global count_td_iter
     global count_ts_map
-    global count_ts_itr
+    global count_ts_iter
 
     print(f'[DEBUG] ds = {ds}, dataloader_type = {dataloader_type}')
 
@@ -67,7 +67,7 @@ def debug(ds, dataloader_type):
         if dataloader_type == 'm':
             count_ts_map += 1
         elif dataloader_type == 'i':
-            count_ts_itr += 1
+            count_ts_iter += 1
 
 def read_file_name(file_name):
     # print(f'[DEBUG] file_name = {file_name}')
@@ -75,7 +75,7 @@ def read_file_name(file_name):
     global worker
     global rows_per_key
     global type 
-    global batch
+    global batch_size
     global prefetch_size
     global data_store
     global workload
@@ -112,7 +112,7 @@ def get_file_content(file_name):
     write_time = 0
     read_time = 0
 
-    with open(file_name) as f:
+    with open(file_name, 'r') as f:
         for index, line in enumerate(f):
             line = line.split()
             if len(line) == 5 and line[1] == 'Write':
@@ -120,13 +120,12 @@ def get_file_content(file_name):
             elif len(line) == 6 and line[1] == 'Dataloader':
                 read_time = float(line[4])
 
+    
     return write_time, read_time
 
 def run_parser():
-    measurements = defaultdict(list)
-    collect_metrics(measurements)
-    # TODO: Uncomment later
-    # write_to_csv(measurements)
+    measurements = collect_metrics()
+    write_to_csv(measurements)
 
     print(f'[DEBUG] count_rd_map = {count_rd_map} \
         count_rd_iter = {count_rd_iter} \
@@ -135,13 +134,13 @@ def run_parser():
         count_ts_map = {count_ts_map} \
         count_ts_iter = {count_ts_iter}')
 
-def collect_metrics(measurements):
+def collect_metrics():
+    measurements = defaultdict(list)
     for input_file in args.input_file:
         # print(f'[DEBUG] input_file = {input_file}')
-        # TODO: Uncomment later
         read_file_name(input_file)
         debug(data_store, type)
-        # write, read = get_file_content(input_file)
+        write, read = get_file_content(input_file)
         # print(f'[DEBUG] write = {write}, read = {read}')
 
         key = ''
@@ -151,24 +150,35 @@ def collect_metrics(measurements):
             key = f'{data_store}_{workload}_w{worker}_r{rows_per_key}_t{type}_b{batch_size}_p{prefetch_size}'
         
         # print(f'[DEBUG] key = {key}')
-        # TODO: Uncomment later
-        # measurements[key].append(write)
-        # measurements[key].append(read)
-        measurements[key].append(0)
-        measurements[key].append(0)
+
+        measurements[key].append(write)
+        measurements[key].append(read)
+
+    return measurements
 
 def write_to_csv(measurements):
     for item in workload_list:
         for t in type_list:
             if t == 'm':
-                for r in rows_per_key_list:
-                    csv_file_data = []
-                    for b in batch_size_list:
-                        row_data = []
-                        for w in workers_list:
-                            for ds in data_store_list:
-                                key = f'{ds}_{item}_w{w}_r{r}_t{t}_b{b}'
-                                # print(f'[DEBUG] try for key = {key}')
+                csv_file_data = []
+                for b in batch_size_list:
+                    row_data = []
+                    for w in workers_list:
+                        for ds in data_store_list:
+                            if ds == 'rd':
+                                for r in rows_per_key_list:
+                                    key = f'{ds}_{item}_w{w}_r{r}_t{t}_b{b}'
+                                    # print(f'[DEBUG] try for key = {key}')
+                                    
+                                    if key in measurements and len(measurements[key]) == 2:
+                                        row_data.append(measurements[key][0]) # write
+                                        row_data.append(measurements[key][1]) # read
+                                    else:
+                                        print(f'[INFO] {key} does not exist or len is not 2')
+                                        row_data.append(None)
+                                        row_data.append(None)
+                            else:
+                                key = f'{ds}_{item}_w{w}_r1_t{t}_b{b}'
                                 if key in measurements and len(measurements[key]) == 2:
                                     row_data.append(measurements[key][0]) # write
                                     row_data.append(measurements[key][1]) # read
@@ -176,15 +186,15 @@ def write_to_csv(measurements):
                                     print(f'[INFO] {key} does not exist or len is not 2')
                                     row_data.append(None)
                                     row_data.append(None)
-                                
-                        csv_file_data.append(row_data)
+                                    
+                                    
+                    csv_file_data.append(row_data)
                     
-                    output_file_name = f'{item}_r{r}_t{t}.csv'
-                    # TODO: Uncomment later
-                    # with open(output_file_name, 'w', encoding='UTF8') as f:
-                    #     writer = csv.writer(f)
-                    #     for row in csv_file_data:
-                    #         writer.writerow(row)
+                    output_file_name = f'{item}_t{t}.csv'
+                    with open(output_file_name, 'w', encoding='UTF8') as f:
+                        writer = csv.writer(f)
+                        for row in csv_file_data:
+                            writer.writerow(row)
 
             elif t == 'i':
                 for p in prefetch_size_list:
@@ -205,11 +215,11 @@ def write_to_csv(measurements):
                         csv_file_data.append(row_data)
                     
                     output_file_name = f'{item}_p{p}_t{t}.csv'
-                    # TODO: Uncomment later
-                    # with open(output_file_name, 'w', encoding='UTF8') as f:
-                    #     writer = csv.writer(f)
-                    #     for row in csv_file_data:
-                    #         writer.writerow(row)
+                    
+                    with open(output_file_name, 'w', encoding='UTF8') as f:
+                        writer = csv.writer(f)
+                        for row in csv_file_data:
+                            writer.writerow(row)
 
 if __name__ == "__main__":
     run_parser()
