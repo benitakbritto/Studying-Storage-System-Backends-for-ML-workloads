@@ -1,7 +1,7 @@
 '''
     @brief: Status of tests that completed
     @prereq: bash
-    @command: python output_file_checker.py
+    @usage: python output_file_checker.py
     @authors: Benita, Hemal, Reetuparna
 '''
 
