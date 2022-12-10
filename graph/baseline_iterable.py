@@ -34,6 +34,11 @@ class BaselineGraphIterableDataset(IterableDataset):
     def __iter__(self):
         for data in self.dataset:
             yield data
+    
+    @staticmethod
+    def collate_fn(data):
+        # Important, pass through collate to obtain data in triplet form
+        return data
 
 
 if __name__=='__main__':
@@ -47,9 +52,10 @@ if __name__=='__main__':
     dataset = BaselineGraphIterableDataset(args.input_path)
 
     dataloader = DataLoader(
-                    BaselineGraphIterableDataset(args.input_path),
+                    dataset,
                     batch_size = int(args.batch_size), 
                     shuffle=False,
+                    collate_fn=BaselineGraphIterableDataset.collate_fn,
                     num_workers=0)
  
     for _, batch in enumerate(dataloader):

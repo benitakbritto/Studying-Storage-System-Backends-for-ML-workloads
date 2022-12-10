@@ -3,4 +3,5 @@
 **/db_path
 **/output
 **/embedding_path
+**/rocks_embedding_path
 **/mnt

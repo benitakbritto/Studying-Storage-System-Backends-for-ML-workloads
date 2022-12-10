@@ -11,6 +11,7 @@ class TileDBMapDataset(Dataset):
         return self.len
 
     def __getitem__(self, idx):
+        # print(idx)
         with tiledb.open(self.tile_uri, 'r') as A:
             data = A.query(attrs=("im", "label"), coords=False, order='G')[idx:idx+1]
 

@@ -13,6 +13,8 @@ from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 from tensor_store.store import TSStore
 from tensor_store.TensorStoreDataset import TensorStoreDataset
 import rocksDB.db_util
+from baseline_iterable import BaselineGraphIterableDataset
+from baseline_map import BaselineGraphDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -20,7 +22,7 @@ parser = argparse.ArgumentParser()
 # Adding  argument
 parser.add_argument("-ds", 
     help = "Backend Data Store. rd for RocksDB, ts for TensorStore, td for TileDB", 
-    choices=['rd', 'ts', 'td'],
+    choices=['rd', 'ts', 'td', 'base'],
     required=True)
 parser.add_argument("-pf",
     help="Number of items to prefetch within dataset",
@@ -122,11 +124,14 @@ def run_test():
                 tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
                 end = time.time()
 
+            # hardcoded as finding len programmatically causes workers freeze for some reason
+            size = 272115
+
             # prepare dataset and dataloader
             if args.type == 'i':
-                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=size, tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+                dataset = TileDBMapDataset(size=size, tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
@@ -157,11 +162,25 @@ def run_test():
             elif args.type == 'i':
                 raise NotImplementedError("Not implemented")
 
+        elif args.ds == 'base':
+            if args.type == 'm':
+                dataset = BaselineGraphDataset(args.input_file)
+            elif args.type == 'i':
+                dataset = BaselineGraphIterableDataset(args.input_file)
+            else:
+                raise NotImplementedError("Not implemented")
+
+            dataloader = DataLoader(
+                    dataset,
+                    batch_size = int(args.batch_size), 
+                    shuffle=False,
+                    num_workers=int(args.num_workers))
+        
         else:
             raise NotImplementedError("Not implemented")
 
 
-        if not args.skip_write:
+        if not args.skip_write and args.ds!='base':
             print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader

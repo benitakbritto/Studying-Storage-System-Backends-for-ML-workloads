@@ -22,19 +22,19 @@ parser.add_argument("-batch-size",
     help="Batch size for the dataloader",
     default=256,
     required=False)
-parser.add_argument("-input-path",
-    help="Path for input data",
+parser.add_argument("-input-file",
+    help="file for input data",
     required=True)
 
 
 if __name__=='__main__':
-    # Example: python baseline_map.py -batch-size 1024 -num-workers 8 -input-path  /mnt/data/dataset/cifar/
+    # Example: python baseline_map.py -batch-size 1024 -num-workers 8 -input-file  /mnt/data/dataset/cifar/
     
     # Read arguments from command line
     args = parser.parse_args()
 
     start = time.time()
-    dataset = PrepareData(args.input_path).getInputData() # map style
+    dataset = PrepareData(args.input_file).getInputData() # map style
 
     dataloader = DataLoader(
                     dataset,

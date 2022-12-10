@@ -17,31 +17,31 @@ parser.add_argument("-batch-size",
     help="Batch size for the dataloader",
     default=256,
     required=False)
-parser.add_argument("-input-path",
+parser.add_argument("-input-file",
     help="Path for input data",
     required=True)
 
 class BaselineTextIterableDataset(IterableDataset):
 
-    def __init__(self, input_path):
+    def __init__(self, input_file):
         #Store the filename in object's memory
-        self.input_path = input_path
+        self.input_file = input_file
         #And that's it, we no longer need to store the contents in the memory
 
     def __iter__(self):
         #Create an iterator
-        file_itr = open(self.input_path, encoding='ISO-8859-1')
+        file_itr = open(self.input_file, encoding='ISO-8859-1')
         return file_itr
 
 
 if __name__=='__main__':
-    # Example:  python baseline_iterable.py -batch-size 1024 -input-path /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv
+    # Example:  python baseline_iterable.py -batch-size 1024 -input-file /mnt/data/dataset/twitter/twitter_sentiment_dataset.csv
     
     # Read arguments from command line
     args = parser.parse_args()
 
     start = time.time()
-    dataset = BaselineTextIterableDataset(args.input_path)
+    dataset = BaselineTextIterableDataset(args.input_file)
 
     dataloader = DataLoader(
                     dataset,

@@ -21,6 +21,7 @@ class TileDBIterator():
         return self
 
     def __next__(self):
+        # print(self.curr_idx)
         if self.curr_idx >= self.end_idx:
             print('raising ex:', self.curr_idx)
             raise StopIteration

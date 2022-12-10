@@ -13,7 +13,7 @@ from tensor_store.data_loader import TensorStoreDataset
 from tensor_store.TensorStoreIterableDataset import TensorStoreIterableDataset
 import rocksDB.db_util
 from multiprocessing import Process
-
+from tensor_store.PrepareData import PrepareData
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 # Adding  argument
 parser.add_argument("-ds", 
     help = "Backend Data Store. rd for RocksDB, ts for TensorStore, td for TileDB", 
-    choices=['rd', 'ts', 'td'],
+    choices=['rd', 'ts', 'td', 'base'],
     required=True)
 parser.add_argument("-pf",
     help="Number of items to prefetch within dataset",
@@ -124,11 +124,14 @@ def run_test():
                 tile_db_dump.dump_to_db(root_dir=root_dir, tile_uri=tile_uri)
                 end = time.time()
 
+            # hardcoded as finding len programmatically causes workers freeze for some reason
+            size = 50000
+
             # prepare dataset and dataloader
             if args.type == 'i':
-                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+                dataset = TileDBIterableDataset(cache_len=int(args.pf), start=0, end=size, tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), tile_uri=tile_uri)
+                dataset = TileDBMapDataset(size=size, tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, batch_size=int(args.batch_size), num_workers=int(args.num_workers))
 
@@ -157,10 +160,22 @@ def run_test():
                 num_workers=int(args.num_workers)
             )
 
+        elif args.ds == 'base':
+            if args.type == 'm':
+                dataset = PrepareData(args.input_file).getInputData() # map style
+            else:
+                raise NotImplementedError("Not implemented")
+
+            dataloader = DataLoader(
+                dataset,
+                batch_size = int(args.batch_size), 
+                shuffle=False,
+                num_workers=int(args.num_workers))
+
         else:
             raise NotImplementedError("Not implemented")
 
-        if not args.skip_write:
+        if not args.skip_write and args.ds!='base':
             print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader

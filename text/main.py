@@ -15,6 +15,8 @@ from tensor_store.store import TSStore
 from tensor_store.TensorStoreDataset import TensorStoreDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 import rocksDB.db_util
+from baseline_iterable import BaselineTextIterableDataset 
+from baseline_map import BaselineTextDataset 
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -22,7 +24,7 @@ parser = argparse.ArgumentParser()
 # Adding  argument
 parser.add_argument("-ds", 
     help = "Backend Data Store. rd for RocksDB, ts for TensorStore, td for TileDB", 
-    choices=['rd', 'ts', 'td'],
+    choices=['rd', 'ts', 'td', 'base'],
     required=True)
 parser.add_argument("-pf",
     help="Number of items to prefetch within dataset",
@@ -113,10 +115,12 @@ def run_test():
         elif args.ds == 'td':
             # dump to db
             root_dir = str(Path(args.input_file).parent)
+            # print("root_dir:", root_dir)
 
             # switch to input file name from args
             dataset_uri = args.input_file
             tile_uri = root_dir + "/twitter.tldb"
+            # print("tile_uri:", tile_uri)
 
             if not args.skip_write:
                 # destroy path
@@ -127,14 +131,16 @@ def run_test():
                 tile_db_dump.dump_to_db(tile_uri=tile_uri, dataset_uri=dataset_uri)
                 end = time.time()
 
+            # hardcoded as finding len programmatically causes workers freeze for some reason
+            size = 1600000
             # prepare dataset and dataloader
             if args.type == 'i':
                 dataset = TileDBIterableDataset(cache_len=int(args.pf), 
                     start=0, 
-                    end=get_dataset_count(tile_uri=tile_uri), 
+                    end=size,
                     tile_uri=tile_uri)
             elif args.type == 'm':
-                dataset = TileDBMapDataset(size=get_dataset_count(tile_uri=tile_uri), 
+                dataset = TileDBMapDataset(size=size, 
                     tile_uri=tile_uri)
 
             dataloader = DataLoader(dataset=dataset, 
@@ -171,10 +177,27 @@ def run_test():
             elif args.type == 'i':
                 raise NotImplementedError("Not implemented")
 
+        elif args.ds == 'base':
+
+            if args.type == 'm':
+                dataset = BaselineTextDataset(args.input_file)
+                workers = int(args.num_workers)
+
+            elif args.type == 'i':
+                dataset = BaselineTextIterableDataset(args.input_file)
+                workers = 0 #since we are reading the file sequentially, we cant parallelize the data sampling 
+                
+            dataloader = DataLoader(
+                                dataset,
+                                batch_size = int(args.batch_size), 
+                                shuffle=False,
+                                num_workers=workers) 
+        
+
         else:
             raise NotImplementedError("Not implemented")
 
-        if not args.skip_write:
+        if not args.skip_write and args.ds!='base':
             print(f'{args.ds} Write = {end - start} s')
 
         # Call dataloader
