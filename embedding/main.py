@@ -16,6 +16,11 @@ parser.add_argument("-ds-size",
     help="Dataset size",
     required=False)
 
+parser.add_argument("-ds", 
+    help = "Backend Data Store. rd for RocksDB, ts for TensorStore, td for TileDB. all for All", 
+    choices=['rd', 'ts', 'td', 'all'],
+    required=False)
+
 parser.add_argument("-batch-size",
     help="Batch size",
     default=256,
@@ -69,6 +74,9 @@ def gen_emb(size):
 # tile_store = TileDBEmbedding(rows_count=max_number, cols_count=emb_size, tile_uri=get_tile_uri(type))
 
 ds_list = ['rd', 'td', 'ts']
+
+if args.ds != 'all':
+    ds_list = [args.ds]
 
 for ds in ds_list:
     store = BaseStore()
