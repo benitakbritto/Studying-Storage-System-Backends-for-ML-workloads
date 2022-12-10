@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# rm -rf ../output/*
+
 mkdir -p ../output/rd/text
 mkdir -p ../output/rd/image
 mkdir -p ../output/rd/graph

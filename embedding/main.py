@@ -73,7 +73,7 @@ def gen_emb(size):
 # r_store = RocksDBEmbedding()
 # tile_store = TileDBEmbedding(rows_count=max_number, cols_count=emb_size, tile_uri=get_tile_uri(type))
 
-ds_list = ['rd', 'td', 'ts']
+ds_list = ['ts']
 
 if args.ds != 'all':
     ds_list = [args.ds]
