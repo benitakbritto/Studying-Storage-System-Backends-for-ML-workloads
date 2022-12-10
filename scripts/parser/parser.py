@@ -1,7 +1,7 @@
 '''
     @brief: Transform all the output files -> csv
     @prereq: bash
-    @command: python parser.py -input-file ../output/*/*/*
+    @command: python parser.py -input-file ../../output/*/*/*
     @authors: Benita, Hemal, Reetuparna
 '''
 

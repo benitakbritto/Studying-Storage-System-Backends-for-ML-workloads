@@ -1,7 +1,14 @@
+'''
+    @brief: Status of tests that completed
+    @prereq: bash
+    @command: python output_file_checker.py
+    @authors: Benita, Hemal, Reetuparna
+'''
+
 from os.path import exists
 
 # Globals
-file_prefix = '../output'
+file_prefix = '../../output'
 input_size = 1
 data_store_list = ['rd', 'td', 'ts']
 type_list = ['m', 'i']
