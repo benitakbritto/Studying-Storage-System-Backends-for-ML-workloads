@@ -28,18 +28,29 @@ class TileDBEmbedding(BaseStore):
 
         tiledb.DenseArray.create(tile_uri, schema, overwrite=True)
 
-        print('TileDB schema created')    
+        # print('TileDB schema created')
 
     def store_data(self, key_list, value_list):
         # convert to tuple of embedding_len
         data = np.array([tuple(row) for row in value_list], dtype=self.np_tuple_type)
 
+        # tiledb does not have the bulk update on random indexes, only range is accepted
         with tiledb.DenseArray(self.tile_uri, mode='w') as A:
-            A[key_list] = {'em': data}
+            # import pdb; pdb.set_trace()
+            for i, key in enumerate(key_list):
+                A[key] = {'em': np.array(data[i])}
+        
+        # print("write done")
 
     def get_data(self, key_list):
+        data = None
+
         with tiledb.open(self.tile_uri, 'r') as A:
-            return A[key_list]
+            # import pdb; pdb.set_trace()
+            data = A.multi_index[key_list]['em']
+
+        # print('read done')    
+        return data
         
 
 

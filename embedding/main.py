@@ -48,6 +48,7 @@ input_file = args.input_file
 
 # create dataset, fetch the max numbers which is required for TensorStore and TileDB
 max_number = gen(type=type, size=ds_size, output_file=path)
+print("dataset prepared")
 
 dataset = EmbedddingIterableDataset(path=path)
 dataloader = DataLoader(dataset, batch_size = batch_size)
@@ -66,13 +67,15 @@ def gen_emb(size):
 # r_store = RocksDBEmbedding()
 # tile_store = TileDBEmbedding(rows_count=max_number, cols_count=emb_size, tile_uri=get_tile_uri(type))
 
-for ds in ['rd', 'ts', 'td']:
+ds_list = ['rd', 'td', 'ts']
+
+for ds in ds_list:
     store = BaseStore()
 
     if ds == 'rd':
         store = RocksDBEmbedding()
     elif ds == 'td':
-        store = TileDBEmbedding(rows_count=max_number, cols_count=emb_size, tile_uri=get_tile_uri(type))
+        store = TileDBEmbedding(rows_count=max_number + 1, cols_count=emb_size, tile_uri=get_tile_uri(type))
     elif ds == 'ts':
         pass
     else:
