@@ -5,17 +5,18 @@ NOCOLOR='\033[0m'
 
 # Constants
 WORKLOAD=text
-DS=all
+DS=ts
 INPUT_FILE=/mnt/data/embeddings/text.txt
 TYPE=zipf
-DS_SIZE=1024
-DS_SIZE_LIMIT=2048
+DS_SIZE=8192
+# fb15k in 2s power
+DS_SIZE_LIMIT=524288
 EMBED_SIZE_LIMIT=400
 BATCH_SIZE_LIMIT=1024
 
 while [ $DS_SIZE -le $DS_SIZE_LIMIT ]
 do 
-    EMBED_SIZE=100
+    EMBED_SIZE=200
     while [ $EMBED_SIZE -le $EMBED_SIZE_LIMIT ]
     do
         BATCH_SIZE=128

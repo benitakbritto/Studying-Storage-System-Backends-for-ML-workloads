@@ -14,7 +14,6 @@ from tensor_store.store import TSStore
 from tensor_store.TensorStoreDataset import TensorStoreDataset
 import rocksDB.db_util
 from baseline_iterable import BaselineGraphIterableDataset
-from baseline_map import BaselineGraphDataset
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -163,9 +162,7 @@ def run_test():
                 raise NotImplementedError("Not implemented")
 
         elif args.ds == 'base':
-            if args.type == 'm':
-                dataset = BaselineGraphDataset(args.input_file)
-            elif args.type == 'i':
+            if args.type == 'i':
                 dataset = BaselineGraphIterableDataset(args.input_file)
             else:
                 raise NotImplementedError("Not implemented")
@@ -174,7 +171,7 @@ def run_test():
                     dataset,
                     batch_size = int(args.batch_size), 
                     shuffle=False,
-                    num_workers=int(args.num_workers))
+                    num_workers=0)
         
         else:
             raise NotImplementedError("Not implemented")

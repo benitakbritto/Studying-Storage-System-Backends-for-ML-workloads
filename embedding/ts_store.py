@@ -25,12 +25,10 @@ class TSEmbedding(BaseStore):
         }).result()
 
     def store_data(self, key_list, value_list):
-        start_key = key_list[0]
-        self.db[start_key : start_key+len(key_list), :].write(value_list).result()
+        self.db[key_list, :].write(value_list).result()
 
     def get_data(self, key_list):
-        start_key = key_list[0]
-        data = self.db[start_key : start_key+len(key_list), : ].read().result()
+        data = self.db[key_list, : ].read().result()
         return data
 
 if __name__ == "__main__":

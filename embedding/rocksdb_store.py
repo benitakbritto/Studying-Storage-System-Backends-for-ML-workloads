@@ -7,11 +7,16 @@
 
 from BaseStore import BaseStore
 from rocksdict import Rdict, WriteBatch
+import os, shutil
 
 DB_PATH = './rocks_embedding_path'
 
 class RocksDBEmbedding(BaseStore):
     def __init__(self):
+        # clean up existing DB
+        if os.path.exists(DB_PATH):
+            shutil.rmtree(DB_PATH)
+        
         self.db = Rdict(DB_PATH)
 
     def int_to_bytes(self, x):

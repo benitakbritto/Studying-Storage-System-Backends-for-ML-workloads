@@ -29,31 +29,14 @@ class TileDBEmbedding(BaseStore):
         tiledb.SparseArray.create(tile_uri, schema, overwrite=True)
 
         # print('TileDB schema created')
-    
-    def get_unique_kv(self, key_list, value_list):
-        kv = dict()
-
-        for i, key in enumerate(key_list):
-            kv[key] = value_list[i]
-        
-        keys = []
-        values = []
-
-        for k, v in kv.items():
-            keys.append(k)
-            values.append(v)
-        
-        return keys, values
 
     def store_data(self, key_list, value_list):
-        # sparse array does not support duplicate keys, so building unique kv pairs
-        keys, values = self.get_unique_kv(key_list=key_list, value_list=value_list)
 
         # convert to tuple of embedding_len
-        data = np.array([tuple(row) for row in values], dtype=self.np_tuple_type)
+        data = np.array([tuple(row) for row in value_list], dtype=self.np_tuple_type)
 
         with tiledb.SparseArray(self.tile_uri, mode='w') as A:
-            A[keys] = {'em': data}
+            A[key_list] = {'em': data}
 
         # print("write done")
 

@@ -70,10 +70,25 @@ def get_tile_uri(type):
 def gen_emb(size):
     return np.random.random(size=size)
 
+def get_unique_kv(key_list, value_list):
+    kv = dict()
+
+    for i, key in enumerate(key_list):
+        kv[key] = value_list[i]
+    
+    keys = []
+    values = []
+
+    for k, v in kv.items():
+        keys.append(k)
+        values.append(v)
+    
+    return keys, values
+
 # r_store = RocksDBEmbedding()
 # tile_store = TileDBEmbedding(rows_count=max_number, cols_count=emb_size, tile_uri=get_tile_uri(type))
 
-ds_list = ['rd','td','ts']
+ds_list = ['rd','td']
 
 if args.ds != 'all':
     ds_list = [args.ds]
@@ -87,7 +102,7 @@ for ds in ds_list:
         store = TileDBEmbedding(rows_count=max_number + 1, cols_count=emb_size, tile_uri=get_tile_uri(type))
     elif ds == 'ts':
         # dimensions must exactly match the rows_count, cols_count
-        store = TSEmbedding(rows_count=max_number, cols_count=emb_size)
+        store = TSEmbedding(rows_count=max_number + 1, cols_count=emb_size)
     else:
         NotImplementedError("unsupported datastore")
 
@@ -95,33 +110,20 @@ for ds in ds_list:
 
     for keys in dataloader:
         # convert to numpy
-        keys = keys.numpy(force=False).tolist()
+        key_list = keys.numpy(force=False).tolist()
 
         # fetch the existing embs
-        store.get_data(keys)
-        # if ds == 'rd':
-        #     last_emb = r_store.get_data(keys)
-        # elif ds == 'td':
-        #     last_emb = tile_store.get_data(keys)
-        # elif ds == 'ts':
-        #     pass
-        # else:
-        #     NotImplementedError("unsupported datastore")
+        store.get_data(key_list=key_list)
 
         # create new embs
         new_embs = [gen_emb(emb_size) for _ in range(0, len(keys))]
 
-        # write new embedding to store
-        store.store_data(key_list=keys, value_list=new_embs)
-        # if ds == 'rd':
-        #     r_store.store_data(key_list=keys, value_list=new_embs)
-        # elif ds == 'td':
-        #     tile_store.store_data(key_list=keys, value_list=new_embs)
-        # elif ds == 'ts':
-        #     pass
-        # else:
-        #     NotImplementedError("unsupported datastore")
+        # there might be duplicate keys, so building unique kv pairs
+        key_list, value_list = get_unique_kv(key_list=key_list, value_list=new_embs)
 
+        # write new embedding to store
+        store.store_data(key_list=key_list, value_list=value_list)
+        
     end = time.time()
 
     print(f'Datastore: {ds}, Total time: {end-start} s')
