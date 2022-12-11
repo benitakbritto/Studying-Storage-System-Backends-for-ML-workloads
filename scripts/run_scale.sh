@@ -23,7 +23,7 @@ do
 
     # Baseline
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR TEXT-Baseline ${NOCOLOR}"
-    python ../text/main.py -input-file $AUG_FILE -ds base -num-workers 0 -batch-size 1024 
+    python ../text/main.py -input-file $AUG_FILE -ds base -type i -num-workers 0 -batch-size 1024 
     # RD
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR TEXT-RD ${NOCOLOR}"
     python ../text/main.py -input-file $AUG_FILE -ds rd -type m -input-rows-per-key 1024 -batch-size 1024 -num-workers 32

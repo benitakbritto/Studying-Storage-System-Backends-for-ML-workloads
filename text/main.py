@@ -179,14 +179,13 @@ def run_test():
 
         elif args.ds == 'base':
 
-            if args.type == 'm':
-                dataset = BaselineTextDataset(args.input_file)
-                workers = int(args.num_workers)
-
-            elif args.type == 'i':
+            if args.type == 'i':
                 dataset = BaselineTextIterableDataset(args.input_file)
                 workers = 0 #since we are reading the file sequentially, we cant parallelize the data sampling 
-                
+            
+            else:
+                raise NotImplementedError("Not implemented")
+
             dataloader = DataLoader(
                                 dataset,
                                 batch_size = int(args.batch_size), 
