@@ -22,14 +22,3 @@ do
     echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE}, ${NOCOLOR}"
     python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
 done
-
-# Baseline map
-TYPE=m
-for batchsize in 128 256 512 1024
-do
-    BATCHSIZE=$batchsize
-    OUTPUTFILE="../output/${DS}/${WORKLOAD}/i${INPUTFILESIZE}_w${WORKERS}_r${ROWSPERKEY}_t${TYPE}_b${BATCHSIZE}"
-    
-    echo "${BLUE} DS=${DS}, WORKLOAD=${WORKLOAD}, WORKERS=${WORKERS}, TYPE=${TYPE}, ROWSPERKEY=${ROWSPERKEY}, BATCHSIZE=${BATCHSIZE} ${NOCOLOR}"
-    python ../$WORKLOAD/main.py -ds $DS -input-file $INPUTFILE -type $TYPE -batch-size $BATCHSIZE > $OUTPUTFILE
-done
