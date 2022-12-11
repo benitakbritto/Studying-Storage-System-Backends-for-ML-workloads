@@ -61,4 +61,4 @@ class RocksDBIterator():
         # advance to next index
         self.curr_idx = self.curr_idx + 1
 
-        return self.cache
+        return self.cache[relative_idx]
