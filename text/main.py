@@ -16,7 +16,6 @@ from tensor_store.TensorStoreDataset import TensorStoreDataset
 from rocksDB.iterable_style_data_loader import RocksDBIterableDataset
 import rocksDB.db_util
 from baseline_iterable import BaselineTextIterableDataset 
-from baseline_map import BaselineTextDataset 
 
 # Initialize parser
 parser = argparse.ArgumentParser()
