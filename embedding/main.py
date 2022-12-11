@@ -102,7 +102,7 @@ for ds in ds_list:
         store = TileDBEmbedding(rows_count=max_number + 1, cols_count=emb_size, tile_uri=get_tile_uri(type))
     elif ds == 'ts':
         # dimensions must exactly match the rows_count, cols_count
-        store = TSEmbedding(rows_count=max_number, cols_count=emb_size)
+        store = TSEmbedding(rows_count=max_number + 1, cols_count=emb_size)
     else:
         NotImplementedError("unsupported datastore")
 
