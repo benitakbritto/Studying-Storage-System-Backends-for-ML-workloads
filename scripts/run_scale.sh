@@ -8,7 +8,7 @@ OUTPUT_TWITTER_PREFIX=/mnt/data/dataset/twitter/twitter_sentiment_dataset
 OUTPUT_FB15K_PREFIX=/mnt/data/dataset/fb15k-237/train
 
 # ------------------- GRAPH ------------------- 
-for size in 2 1 10
+for size in $(seq 2 1 10)
 do
     INPUT_SIZE=$size
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR GRAPH ${NOCOLOR}"
@@ -23,7 +23,7 @@ do
 
     # Baseline
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR GRAPH-Baseline ${NOCOLOR}"
-    python ../graph/main.py -input-file $AUG_FILE -num-workers 0 -batch-size 512 -type i 
+    python ../graph/main.py -input-file $AUG_FILE -num-workers 0 -batch-size 512 -type i -ds base
     # RD
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR GRAPH-RD ${NOCOLOR}"
     python ../graph/main.py -input-file $AUG_FILE -ds rd -type m -input-rows-per-key 1024 -batch-size 1024 -num-workers 16
@@ -37,7 +37,7 @@ do
 done
 
 # ------------------- TEXT ------------------- 
-for size in 2 1 10
+for size in $(seq 2 1 10)
 do
     INPUT_SIZE=$size
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR TEXT ${NOCOLOR}"
