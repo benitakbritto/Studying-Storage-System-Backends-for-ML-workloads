@@ -3,7 +3,7 @@ NOCOLOR='\033[0m'
 
 # Constants
 WORKLOAD=graph
-DS=all
+DS=ts
 INPUT_FILE=/mnt/data/embeddings/graph.txt
 TYPE=power
 DS_SIZE=8192

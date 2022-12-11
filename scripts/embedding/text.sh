@@ -5,7 +5,7 @@ NOCOLOR='\033[0m'
 
 # Constants
 WORKLOAD=text
-DS=all
+DS=ts
 INPUT_FILE=/mnt/data/embeddings/text.txt
 TYPE=zipf
 DS_SIZE=8192
