@@ -24,16 +24,12 @@ parser.add_argument("-input-path",
 
 class BaselineGraphIterableDataset(IterableDataset):
     def __init__(self, input_file):
-        triples = list()
-        with open(input_file, 'r') as f:
-            for line in f:
-                head, relation, tail = line.strip().split('\t')
-                triples.append((head, relation, tail))
-        self.dataset = triples
+        self.input_file = input_file
 
     def __iter__(self):
-        for data in self.dataset:
-            yield data
+        file_itr = open(self.input_file, 'r')
+        return file_itr
+
     
     @staticmethod
     def collate_fn(data):
@@ -57,10 +53,10 @@ if __name__=='__main__':
                     shuffle=False,
                     collate_fn=BaselineGraphIterableDataset.collate_fn,
                     num_workers=0)
- 
-    for _, batch in enumerate(dataloader):
+
+    for id, batch in enumerate(dataloader):
         # import pdb; pdb.set_trace()
-        pass
+        pass 
     
     end = time.time()
     print(f'time to load = {end - start}s')
