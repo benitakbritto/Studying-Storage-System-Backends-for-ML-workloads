@@ -23,7 +23,7 @@ do
 
     # Baseline
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR TEXT-Baseline ${NOCOLOR}"
-    python ../text/baseline_map.py -input-file $AUG_FILE -num-workers 0 -batch-size 1024
+    python ../text/main.py -input-file $AUG_FILE -ds base -num-workers 0 -batch-size 1024 
     # RD
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR TEXT-RD ${NOCOLOR}"
     python ../text/main.py -input-file $AUG_FILE -ds rd -type m -input-rows-per-key 1024 -batch-size 1024 -num-workers 32
@@ -52,7 +52,7 @@ do
 
     # Baseline
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR GRAPH-Baseline ${NOCOLOR}"
-    python ../graph/baseline_map.py -input-file $AUG_FILE -num-workers 0 -batch-size 512
+    python ../graph/main.py -input-file $AUG_FILE -num-workers 0 -batch-size 512 -type i 
     # RD
     echo "${BLUE} START INPUTSIZE=${INPUT_SIZE} FOR GRAPH-RD ${NOCOLOR}"
     python ../graph/main.py -input-file $AUG_FILE -ds rd -type m -input-rows-per-key 1024 -batch-size 1024 -num-workers 16
