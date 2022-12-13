@@ -150,18 +150,16 @@ def run_test():
             store = TSStore(args.input_file)
             # store.cleanup()
             # Ingest data
-            loop = asyncio.get_event_loop()
-
             if not args.skip_write:
                 os.system('sudo rm -rf /mnt/data/store/*')
+                loop = asyncio.get_event_loop()
+                start = time.time()
+                task = [loop.create_task(store.ingestData())]
 
-            start = time.time()
-            task = [loop.create_task(store.ingestData())]
+                loop.run_until_complete(asyncio.wait(task)) 
+                loop.close()
 
-            loop.run_until_complete(asyncio.wait(task)) 
-            loop.close()
-
-            end = time.time()
+                end = time.time()
 
             # Set Dataloader
             if args.type == 'm':

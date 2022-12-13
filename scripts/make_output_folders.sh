@@ -17,3 +17,18 @@ mkdir -p ../output/ts/graph
 mkdir -p ../output/base/text
 mkdir -p ../output/base/image
 mkdir -p ../output/base/graph
+
+mkdir -p ../output/monitor/text/rd
+mkdir -p ../output/monitor/text/td
+mkdir -p ../output/monitor/text/ts
+mkdir -p ../output/monitor/text/base
+
+mkdir -p ../output/monitor/image/rd
+mkdir -p ../output/monitor/image/td
+mkdir -p ../output/monitor/image/ts
+mkdir -p ../output/monitor/image/base
+
+mkdir -p ../output/monitor/graph/rd
+mkdir -p ../output/monitor/graph/td
+mkdir -p ../output/monitor/graph/ts
+mkdir -p ../output/monitor/graph/base
