@@ -143,10 +143,10 @@ def run_test():
             if not args.skip_write:
                 os.system('sudo rm -rf /mnt/data/store')
                 start = time.time()
-                task = [loop.create_task(store.ingestData())]
-
-                loop.run_until_complete(asyncio.wait(task)) 
-                loop.close()
+                # task = [loop.create_task(store.ingestData())]
+                store.ingestData()
+                # loop.run_until_complete(asyncio.wait(task)) 
+                # loop.close()
 
                 end = time.time()
 

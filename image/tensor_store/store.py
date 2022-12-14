@@ -52,7 +52,7 @@ class TSStore():
             labels = labels.reshape(size, constants.LABEL_SIZE)
             images = images.reshape(size, constants.IMAGE_SIZE)
             imlabels = torch.cat((images, labels), -1)
-            self.db[i:i+size, :].write(imlabels).result()
+            self.db[i:i+size, :].write(imlabels)
             i+=size
         
         self.size = i

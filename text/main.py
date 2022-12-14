@@ -152,13 +152,11 @@ def run_test():
             # Ingest data
             if not args.skip_write:
                 os.system('sudo rm -rf /mnt/data/store/*')
-                loop = asyncio.get_event_loop()
                 start = time.time()
-                task = [loop.create_task(store.ingestData())]
-
-                loop.run_until_complete(asyncio.wait(task)) 
-                loop.close()
-
+                store.ingestData()
+                # task = [loop.create_task(store.ingestData())]
+                # loop.run_until_complete(asyncio.wait(task)) 
+                # loop.close()
                 end = time.time()
 
             # Set Dataloader

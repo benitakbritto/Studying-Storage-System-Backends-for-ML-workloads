@@ -11,7 +11,7 @@ class TSStore:
         self.db = ts.KvStore.open({'driver': 'memory'}).result()
         self.input_file = input_file
 
-    async def ingestData(self):
+    def ingestData(self):
         row_index = 0
         with open(self.input_file, 'r', encoding=constants.INPUT_FILE_ENCODING) as read_obj:
             
@@ -31,7 +31,7 @@ class TSStore:
                 val = json_string.encode()
                 
                 # write to tensorstore
-                await self.db.write(key, val)
+                self.db.write(key, val)
 
                 row_index += 1  
         self.len = row_index
